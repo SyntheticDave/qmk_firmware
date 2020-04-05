@@ -57,8 +57,39 @@ void matrix_init_user(void) {
 
 bool r_alt_down = false;
 
-// Purple: 96, 23, 184
-// Orange: 255, 77, 0
+// Sets a list of keys to the same color
+void rgb_matrix_set_collection_color(uint8_t keys[], int keyCount, uint8_t red, uint8_t green, uint8_t blue){
+  for (int i = 0; i < keyCount; i++) {
+    rgb_matrix_set_color(keys[i], red, green, blue);
+  }
+};
+
+void show_gpm_keys(void) {
+  uint8_t lit_keys[] = {54, 53, 52, 41, 40};
+  uint8_t unlit_keys[] = {25, 26, 27, 38, 39, 51};
+
+  rgb_matrix_set_collection_color(lit_keys, sizeof(lit_keys) / sizeof(uint8_t), RGB_GPM_ORANGE);
+  rgb_matrix_set_collection_color(unlit_keys, sizeof(unlit_keys) / sizeof(uint8_t), 0,0,0);
+}
+
+void show_window_snap_keys(void) {
+  // Window snapping cluster
+  // TODO: Choose highlight colour based on the current colour.
+  //        I'm not sure how to read current values
+  // Want to show a colour if key was already white
+  uint8_t lit_keys[] = {54, 53, 52, 41, 40, 28, 27, 26};
+  uint8_t unlit_keys[] = {11, 12, 13, 25, 38, 39, 42, 51};
+
+  rgb_matrix_set_collection_color(lit_keys, sizeof(lit_keys) / sizeof(uint8_t), RGB_WHITE);
+  rgb_matrix_set_collection_color(unlit_keys, sizeof(unlit_keys) / sizeof(uint8_t), 0,0,0);
+}
+
+void show_layer_indicator(int layer) {
+  if(layer > 0) {
+    rgb_matrix_set_color(1, RGB_MAGENTA);
+    rgb_matrix_set_color(63, RGB_MAGENTA);
+  }
+}
 
 // Runs constantly in the background, in a loop.
 void matrix_scan_user(void) {
@@ -66,73 +97,18 @@ void matrix_scan_user(void) {
     uint8_t layer = biton32(layer_state);
 
     // Set lighting based on the current layer
+    show_layer_indicator(layer);
     switch (layer) {
-        case 1:
-            // Layer Indicator
-            rgb_matrix_set_color(1, 0, 255, 0);
-            rgb_matrix_set_color(63, 0, 255, 0);
-
-            // GPM Control Cluster
-            // TODO: Define this in a nicer structure (both positions and colours)
-            // TODO: Consider disabling lighting for all keys expect those defined specifically for this layer
-            rgb_matrix_set_color(54, 255, 77, 0);
-            rgb_matrix_set_color(53, 255, 77, 0);
-            rgb_matrix_set_color(52, 255, 77, 0);
-            rgb_matrix_set_color(41, 255, 77, 0);
-            rgb_matrix_set_color(40, 255, 77, 0);
-
-            // GPM Control Cluster Unlit Outline
-            rgb_matrix_set_color(51, 0, 0, 0);
-            rgb_matrix_set_color(39, 0, 0, 0);
-            rgb_matrix_set_color(38, 0, 0, 0);
-            rgb_matrix_set_color(27, 0, 0, 0);
-            rgb_matrix_set_color(26, 0, 0, 0);
-            rgb_matrix_set_color(25, 0, 0, 0);
-            break;
+      case 1:
+        show_gpm_keys();
+        break;
     }
 
     // Set lighting based on individully held key
     if(r_alt_down) {
-      // Window snapping cluster
-      // TODO: Choose highlight colour based on the current colour.
-      rgb_matrix_set_color(54, 255, 255, 255);
-      rgb_matrix_set_color(53, 255, 255, 255);
-      rgb_matrix_set_color(52, 255, 255, 255);
-      rgb_matrix_set_color(41, 255, 255, 255);
-      rgb_matrix_set_color(40, 255, 255, 255);
-      rgb_matrix_set_color(28, 255, 255, 255);
-      rgb_matrix_set_color(27, 255, 255, 255);
-      rgb_matrix_set_color(26, 255, 255, 255);
-
-      // Unlit outline
-      rgb_matrix_set_color(11, 0, 0, 0);
-      rgb_matrix_set_color(12, 0, 0, 0);
-      rgb_matrix_set_color(13, 0, 0, 0);
-      rgb_matrix_set_color(25, 0, 0, 0);
-      rgb_matrix_set_color(39, 0, 0, 0);
-      rgb_matrix_set_color(38, 0, 0, 0);
-      rgb_matrix_set_color(42, 0, 0, 0);
-      rgb_matrix_set_color(51, 0, 0, 0);
+      show_window_snap_keys();
     }
 };
-
-// const uint8_t PROGMEM ledcolors[][DRIVER_LED_TOTAL][3] = {
-//   [1]= {
-//     {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {142,123,255}, {142,123,255}, {142,123,255}, {142,123,255}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}
-//   }
-// };
-
-// void set_leds_color( int layer) {
-//   for (int i = 0; i < DRIVER_LED_TOTAL; i++) {
-//     uint8_t val = pgm_read_byte(&ledcolors[layer][i][2]);
-//     // if the brightness of the led is set to 0 in the map,
-//     // the value is not overriden with global controls, allowing the led
-//     // to appear turned off
-//     HSV hsv = { .h = pgm_read_byte(&ledcolors[layer][i][0]), .s = pgm_read_byte(&ledcolors[layer][i][1]), .v = val };
-//     RGB rgb = hsv_to_rgb( hsv );
-//     rgb_matrix_set_color( i, rgb.r, rgb.g, rgb.b );
-//   }
-// };
 
 #define MODS_SHIFT  (get_mods() & MOD_BIT(KC_LSHIFT) || get_mods() & MOD_BIT(KC_RSHIFT))
 #define MODS_CTRL  (get_mods() & MOD_BIT(KC_LCTL) || get_mods() & MOD_BIT(KC_RCTRL))

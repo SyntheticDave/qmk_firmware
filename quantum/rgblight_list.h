@@ -35,6 +35,9 @@
 #define RGB_MAGENTA 0xFF, 0x00, 0xFF
 #define RGB_PINK 0xFF, 0x80, 0xBF
 
+#define RGB_GPM_ORANGE 0xFF, 0x4D, 0x00
+#define RGB_DARK_PURPLE 0x60, 0x17, 0xB8
+
 /*            HSV COLORS            */
 #define HSV_WHITE 0, 0, 255
 #define HSV_RED 0, 255, 255
