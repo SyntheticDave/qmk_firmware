@@ -1,9 +1,12 @@
 // TODO: Move lighting config to a new (sticky?) layer
-// TODO: Add custom colours to GPM control cluster
 // TODO: Add ability to quickly disable/enable GUI/META/SUPER key (either toggle, or have a 'gaming' layer)
 // TODO: Consider leader key commands (needs a dedicated key, regardless of layer)
+// TODO: Determine how to change lighting based on which key is pressed (not layer based)
+//        This we probably want to do this by setting flags based on pressed key in process_record_user
 
 #include QMK_KEYBOARD_H
+
+#include <print.h>
 
 enum alt_keycodes {
     U_T_AUTO = SAFE_RANGE, //USB Extra Port Toggle Auto Detect / Always Active
@@ -43,13 +46,71 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     */
 };
 
+void keyboard_post_init_user(void) {
+  // Customise these values to desired behaviour
+  debug_enable=true;
+  debug_matrix=true;
+  //debug_keyboard=true;
+  //debug_mouse=true;
+}
+
 // Runs just one time when the keyboard initializes.
 void matrix_init_user(void) {
 };
 
+// Purple: 96, 23, 184
+// Orange: 255, 77, 0
+
 // Runs constantly in the background, in a loop.
 void matrix_scan_user(void) {
+    // Find the current layer
+    uint8_t layer = biton32(layer_state);
+
+
+
+    switch (layer) {
+        case 1:
+            // Layer Indicator
+            rgb_matrix_set_color(1, 0, 255, 0);
+            rgb_matrix_set_color(63, 0, 255, 0);
+
+            // GPM Control Cluster
+            // TODO: Define this in a nicer structure (both positions and colours)
+            // TODO: Consider disabling lighting for all keys expect those defined specifically for this layer
+            rgb_matrix_set_color(54, 255, 77, 0);
+            rgb_matrix_set_color(53, 255, 77, 0);
+            rgb_matrix_set_color(52, 255, 77, 0);
+            rgb_matrix_set_color(41, 255, 77, 0);
+            rgb_matrix_set_color(40, 255, 77, 0);
+
+            // GPM Control Cluster Unlit Outline
+            rgb_matrix_set_color(51, 0, 0, 0);
+            rgb_matrix_set_color(39, 0, 0, 0);
+            rgb_matrix_set_color(38, 0, 0, 0);
+            rgb_matrix_set_color(27, 0, 0, 0);
+            rgb_matrix_set_color(26, 0, 0, 0);
+            rgb_matrix_set_color(25, 0, 0, 0);
+            break;
+    }
 };
+
+// const uint8_t PROGMEM ledcolors[][DRIVER_LED_TOTAL][3] = {
+//   [1]= {
+//     {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {142,123,255}, {142,123,255}, {142,123,255}, {142,123,255}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}
+//   }
+// };
+
+// void set_leds_color( int layer) {
+//   for (int i = 0; i < DRIVER_LED_TOTAL; i++) {
+//     uint8_t val = pgm_read_byte(&ledcolors[layer][i][2]);
+//     // if the brightness of the led is set to 0 in the map,
+//     // the value is not overriden with global controls, allowing the led
+//     // to appear turned off
+//     HSV hsv = { .h = pgm_read_byte(&ledcolors[layer][i][0]), .s = pgm_read_byte(&ledcolors[layer][i][1]), .v = val };
+//     RGB rgb = hsv_to_rgb( hsv );
+//     rgb_matrix_set_color( i, rgb.r, rgb.g, rgb.b );
+//   }
+// };
 
 #define MODS_SHIFT  (get_mods() & MOD_BIT(KC_LSHIFT) || get_mods() & MOD_BIT(KC_RSHIFT))
 #define MODS_CTRL  (get_mods() & MOD_BIT(KC_LCTL) || get_mods() & MOD_BIT(KC_RCTRL))
@@ -57,6 +118,11 @@ void matrix_scan_user(void) {
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     static uint32_t key_timer;
+
+      // If console is enabled, it will print the matrix position and status of each key pressed
+      #ifdef CONSOLE_ENABLE
+          uprintf("KL: kc: %u, col: %u, row: %u, pressed: %u\n", keycode, record->event.key.col, record->event.key.row, record->event.pressed);
+      #endif
 
     switch (keycode) {
         case U_T_AUTO:
