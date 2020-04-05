@@ -1,8 +1,7 @@
 // TODO: Move lighting config to a new (sticky?) layer
 // TODO: Add ability to quickly disable/enable GUI/META/SUPER key (either toggle, or have a 'gaming' layer)
 // TODO: Consider leader key commands (needs a dedicated key, regardless of layer)
-// TODO: Determine how to change lighting based on which key is pressed (not layer based)
-//        This we probably want to do this by setting flags based on pressed key in process_record_user
+// TODO: Consider double tapping (tap dance) a layer key to lock to that layer. Fn key would unlock and drop to the base layer again
 
 #include QMK_KEYBOARD_H
 
@@ -17,8 +16,6 @@ enum alt_keycodes {
     DBG_MOU,               //DEBUG Toggle Mouse Prints
     MD_BOOT,               //Restart into bootloader after hold timeout
 };
-
-keymap_config_t keymap_config;
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [0] = LAYOUT_65_ansi_blocker(
@@ -58,6 +55,8 @@ void keyboard_post_init_user(void) {
 void matrix_init_user(void) {
 };
 
+bool r_alt_down = false;
+
 // Purple: 96, 23, 184
 // Orange: 255, 77, 0
 
@@ -66,8 +65,7 @@ void matrix_scan_user(void) {
     // Find the current layer
     uint8_t layer = biton32(layer_state);
 
-
-
+    // Set lighting based on the current layer
     switch (layer) {
         case 1:
             // Layer Indicator
@@ -91,6 +89,30 @@ void matrix_scan_user(void) {
             rgb_matrix_set_color(26, 0, 0, 0);
             rgb_matrix_set_color(25, 0, 0, 0);
             break;
+    }
+
+    // Set lighting based on individully held key
+    if(r_alt_down) {
+      // Window snapping cluster
+      // TODO: Choose highlight colour based on the current colour.
+      rgb_matrix_set_color(54, 255, 255, 255);
+      rgb_matrix_set_color(53, 255, 255, 255);
+      rgb_matrix_set_color(52, 255, 255, 255);
+      rgb_matrix_set_color(41, 255, 255, 255);
+      rgb_matrix_set_color(40, 255, 255, 255);
+      rgb_matrix_set_color(28, 255, 255, 255);
+      rgb_matrix_set_color(27, 255, 255, 255);
+      rgb_matrix_set_color(26, 255, 255, 255);
+
+      // Unlit outline
+      rgb_matrix_set_color(11, 0, 0, 0);
+      rgb_matrix_set_color(12, 0, 0, 0);
+      rgb_matrix_set_color(13, 0, 0, 0);
+      rgb_matrix_set_color(25, 0, 0, 0);
+      rgb_matrix_set_color(39, 0, 0, 0);
+      rgb_matrix_set_color(38, 0, 0, 0);
+      rgb_matrix_set_color(42, 0, 0, 0);
+      rgb_matrix_set_color(51, 0, 0, 0);
     }
 };
 
@@ -190,6 +212,9 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
               }
             }
             return false;
+        case KC_RALT:
+          r_alt_down = record->event.pressed;
+          return true;
         default:
             return true; //Process all other keycodes normally
     }
