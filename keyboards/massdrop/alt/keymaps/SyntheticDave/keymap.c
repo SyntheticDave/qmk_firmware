@@ -1,11 +1,16 @@
-// TODO: Move lighting config to a new (sticky?) layer
-// TODO: Add ability to quickly disable/enable GUI/META/SUPER key (either toggle, or have a 'gaming' layer)
-// TODO: Consider leader key commands (needs a dedicated key, regardless of layer)
-// TODO: Consider double tapping (tap dance) a layer key to lock to that layer. Fn key would unlock and drop to the base layer again
-
 #include QMK_KEYBOARD_H
 
 #include <print.h>
+
+enum layers {
+  DEFAULT = 0,
+  MAC = 1,
+  MAC_SPECIAL = 2,
+  WIN = 3,
+  WIN_GAMING = 4,
+  WIN_SPECIAL = 5,
+  RGB_CONFIG = 6
+};
 
 enum alt_keycodes {
     U_T_AUTO = SAFE_RANGE, //USB Extra Port Toggle Auto Detect / Always Active
@@ -18,20 +23,56 @@ enum alt_keycodes {
 };
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
-    [0] = LAYOUT_65_ansi_blocker(
+    [DEFAULT] = LAYOUT_65_ansi_blocker(
         KC_GESC,  KC_1,    KC_2,    KC_3,    KC_4,    KC_5,    KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    KC_MINS, KC_EQL,  KC_BSPC, KC_DEL,  \
         KC_TAB,  KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,    KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    KC_LBRC, KC_RBRC, KC_BSLS, KC_HOME, \
         KC_LEAD, KC_A,    KC_S,    KC_D,    KC_F,    KC_G,    KC_H,    KC_J,    KC_K,    KC_L,    KC_SCLN, KC_QUOT,          KC_ENT,  KC_PGUP, \
         KC_LSPO, KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,    KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH, KC_RSPC,          KC_UP,   KC_PGDN, \
-        KC_LCTL, KC_LALT, KC_LGUI,                            KC_SPC,                             KC_RALT, MO(1),   KC_LEFT, KC_DOWN, KC_RGHT  \
+        KC_LCTL, KC_LALT, KC_LGUI,                            KC_SPC,                             KC_RALT, KC_RGUI,   KC_LEFT, KC_DOWN, KC_RGHT  \
     ),
-    [1] = LAYOUT_65_ansi_blocker(
+    [MAC] = LAYOUT_65_ansi_blocker(
+        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, \
+        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, \
+        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          _______, _______, \
+        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          _______, _______, \
+        _______, _______, _______,                            _______,                            _______, MO(MAC_SPECIAL), _______, _______, _______  \
+    ),
+    [MAC_SPECIAL] = LAYOUT_65_ansi_blocker(
         KC_GRV,  KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,  _______, KC_MUTE, \
-        _______, RGB_SPD, RGB_VAI, RGB_SPI, RGB_HUI, RGB_SAI, _______, U_T_AUTO,U_T_AGCR,_______, KC_PSCR, KC_SLCK, KC_PAUS, _______, KC_END, \
-        _______, RGB_RMOD,RGB_VAD, RGB_MOD, RGB_HUD, RGB_SAD, _______, _______, _______, _______, HYPR(KC_S), HYPR(KC_P),          _______, KC_VOLU, \
-        _______, RGB_TOG, RGB_M_P, RGB_M_R, _______, MD_BOOT, NK_TOGG, DBG_TOG, HYPR(KC_LBRC), HYPR(KC_RBRC), HYPR(KC_I), _______,          KC_PGUP, KC_VOLD, \
+        _______, _______, _______, _______, _______, _______, _______, U_T_AUTO,U_T_AGCR,_______, KC_PSCR, KC_SLCK, KC_PAUS, _______, KC_END, \
+        _______, _______,_______, _______, _______, _______, _______, _______, _______, _______, HYPR(KC_S), HYPR(KC_P),          _______, KC_VOLU, \
+        _______, _______, _______, _______, _______, MD_BOOT, NK_TOGG, DBG_TOG, HYPR(KC_LBRC), HYPR(KC_RBRC), HYPR(KC_I), _______,          KC_PGUP, KC_VOLD, \
         _______, _______, _______,                            _______,                            _______, _______, KC_HOME, KC_PGDN, KC_END  \
     ),
+    [WIN] = LAYOUT_65_ansi_blocker(
+        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, \
+        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, \
+        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          _______, _______, \
+        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          _______, _______, \
+        _______, _______, _______,                            _______,                            _______, MO(WIN_SPECIAL), _______, _______, _______  \
+    ),
+    [WIN_GAMING] = LAYOUT_65_ansi_blocker(
+        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, \
+        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, \
+        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          _______, _______, \
+        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          _______, _______, \
+        _______, _______, KC_NO,                            _______,                            _______, MO(WIN_SPECIAL), _______, _______, _______  \
+    ),
+    [WIN_SPECIAL] = LAYOUT_65_ansi_blocker(
+        KC_GRV,  KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,  _______, _______, \
+        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, \
+        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          _______, _______, \
+        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          _______, _______, \
+        _______, _______, _______,                            _______,                            _______, _______, _______, _______, _______  \
+    ),
+    [RGB_CONFIG] = LAYOUT_65_ansi_blocker(
+        _______,  _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,  _______,  _______,  _______, _______, \
+        _______, RGB_SPD, RGB_VAI, RGB_SPI, RGB_HUI, RGB_SAI, _______, _______,_______,_______, _______, _______, _______, _______, _______, \
+        _______, RGB_RMOD,RGB_VAD, RGB_MOD, RGB_HUD, RGB_SAD, _______, _______, _______, _______, _______, _______,          _______, _______, \
+        _______, RGB_TOG, RGB_M_P, RGB_M_R, _______, _______, _______, _______, _______, _______, _______, _______,          _______, _______, \
+        _______, _______, _______,                            _______,                            _______, _______, _______, _______, _______  \
+    ),
+
     /*
     [X] = LAYOUT(
         _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, \
@@ -66,7 +107,11 @@ void rgb_matrix_set_collection_color(uint8_t keys[], int keyCount, uint8_t red, 
   }
 };
 
-void show_gpm_keys(void) {
+void show_mac_base_keys(void) {
+  rgb_matrix_set_color(60, RGB_MAGENTA);
+}
+
+void show_mac_gpm_keys(void) {
   uint8_t lit_keys[] = {54, 53, 52, 41, 40};
   uint8_t unlit_keys[] = {25, 26, 27, 38, 39, 51};
 
@@ -74,7 +119,7 @@ void show_gpm_keys(void) {
   rgb_matrix_set_collection_color(unlit_keys, sizeof(unlit_keys) / sizeof(uint8_t), 0,0,0);
 }
 
-void show_window_snap_keys(void) {
+void show_mac_window_snap_keys(void) {
   // Window snapping cluster
   // TODO: Choose highlight colour based on the current colour.
   //        I'm not sure how to read current values
@@ -86,10 +131,24 @@ void show_window_snap_keys(void) {
   rgb_matrix_set_collection_color(unlit_keys, sizeof(unlit_keys) / sizeof(uint8_t), 0,0,0);
 }
 
+void show_win_base_keys(void) {
+  rgb_matrix_set_color(60, RGB_BLUE);
+}
+
+void show_win_gaming_keys(void) {
+  // Light up WASD and disable windows button
+  uint8_t lit_keys[] = {17, 31, 32, 33};
+  uint8_t unlit_keys[] = {60};
+
+  rgb_matrix_set_collection_color(lit_keys, sizeof(lit_keys) / sizeof(uint8_t), RGB_RED);
+  rgb_matrix_set_collection_color(unlit_keys, sizeof(unlit_keys) / sizeof(uint8_t), 0,0,0);
+}
+
 void show_layer_indicator(int layer) {
+  // Layer indicator to help me keep my bearings
   if(layer > 0) {
-    rgb_matrix_set_color(1, RGB_MAGENTA);
-    rgb_matrix_set_color(63, RGB_MAGENTA);
+    rgb_matrix_set_color(layer, RGB_MAGENTA);
+    // rgb_matrix_set_color(63, RGB_MAGENTA); // Fn key
   }
 }
 
@@ -101,14 +160,23 @@ void matrix_scan_user(void) {
   // Set lighting based on the current layer
   show_layer_indicator(layer);
   switch (layer) {
-    case 1:
-      show_gpm_keys();
+    case MAC_SPECIAL:
+      show_mac_gpm_keys();
+    case MAC:
+      show_mac_base_keys();
+      break;
+    case WIN_SPECIAL:
+    case WIN:
+      show_win_base_keys();
+      break;
+    case WIN_GAMING:
+      show_win_gaming_keys();
       break;
   }
 
   // Set lighting based on individully held key
-  if(r_alt_down) {
-    show_window_snap_keys();
+  if(r_alt_down && layer == MAC) {
+    show_mac_window_snap_keys();
   }
 
   // Handle Leader Key Behaviour
@@ -118,6 +186,18 @@ void matrix_scan_user(void) {
     // Activate CapsLock on double tapping the leader key
     SEQ_ONE_KEY(KC_LEAD) {
       register_code(KC_CAPS);
+    }
+    SEQ_ONE_KEY(KC_M) {
+      layer_move(MAC);	 // Activate Mac OS Layer (only)
+    }
+    SEQ_ONE_KEY(KC_W) {
+      layer_move(WIN); // Activate Windows Layer (only)
+    }
+    SEQ_TWO_KEYS(KC_W, KC_G) {
+      layer_move(WIN); // Activate Windows Layer (only)
+      layer_on(WIN_GAMING); // Then activate the gaming layer
+    }    SEQ_TWO_KEYS(KC_K, KC_L) {
+      layer_invert(RGB_CONFIG); // Toggle the lighting config layer
     }
 
     leader_end();
