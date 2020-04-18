@@ -127,4 +127,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // Always send Escape if CTRL pressed (so CTRL + SHIFT + ESC still works in Windows)
 #define GRAVE_ESC_CTRL_OVERRIDE
 
+// Leader key options
+// After leader key, every key pressed within timeout MS part of the sequence
+#define LEADER_TIMEOUT 250
+#define LEADER_PER_KEY_TIMING
+
 #include "config_led.h"

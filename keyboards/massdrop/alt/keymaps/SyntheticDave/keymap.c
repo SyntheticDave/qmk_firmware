@@ -21,7 +21,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [0] = LAYOUT_65_ansi_blocker(
         KC_GESC,  KC_1,    KC_2,    KC_3,    KC_4,    KC_5,    KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    KC_MINS, KC_EQL,  KC_BSPC, KC_DEL,  \
         KC_TAB,  KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,    KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    KC_LBRC, KC_RBRC, KC_BSLS, KC_HOME, \
-        KC_CAPS, KC_A,    KC_S,    KC_D,    KC_F,    KC_G,    KC_H,    KC_J,    KC_K,    KC_L,    KC_SCLN, KC_QUOT,          KC_ENT,  KC_PGUP, \
+        KC_LEAD, KC_A,    KC_S,    KC_D,    KC_F,    KC_G,    KC_H,    KC_J,    KC_K,    KC_L,    KC_SCLN, KC_QUOT,          KC_ENT,  KC_PGUP, \
         KC_LSPO, KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,    KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH, KC_RSPC,          KC_UP,   KC_PGDN, \
         KC_LCTL, KC_LALT, KC_LGUI,                            KC_SPC,                             KC_RALT, MO(1),   KC_LEFT, KC_DOWN, KC_RGHT  \
     ),
@@ -42,6 +42,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     ),
     */
 };
+
+LEADER_EXTERNS();
 
 void keyboard_post_init_user(void) {
   // Customise these values to desired behaviour
@@ -76,7 +78,7 @@ void show_window_snap_keys(void) {
   // Window snapping cluster
   // TODO: Choose highlight colour based on the current colour.
   //        I'm not sure how to read current values
-  // Want to show a colour if key was already white
+  // Want to show a different colour if key was already white
   uint8_t lit_keys[] = {54, 53, 52, 41, 40, 28, 27, 26};
   uint8_t unlit_keys[] = {11, 12, 13, 25, 38, 39, 42, 51};
 
@@ -93,21 +95,33 @@ void show_layer_indicator(int layer) {
 
 // Runs constantly in the background, in a loop.
 void matrix_scan_user(void) {
-    // Find the current layer
-    uint8_t layer = biton32(layer_state);
+  // Find the current layer
+  uint8_t layer = biton32(layer_state);
 
-    // Set lighting based on the current layer
-    show_layer_indicator(layer);
-    switch (layer) {
-      case 1:
-        show_gpm_keys();
-        break;
+  // Set lighting based on the current layer
+  show_layer_indicator(layer);
+  switch (layer) {
+    case 1:
+      show_gpm_keys();
+      break;
+  }
+
+  // Set lighting based on individully held key
+  if(r_alt_down) {
+    show_window_snap_keys();
+  }
+
+  // Handle Leader Key Behaviour
+  LEADER_DICTIONARY() {
+    leading = false;
+
+    // Activate CapsLock on double tapping the leader key
+    SEQ_ONE_KEY(KC_LEAD) {
+      register_code(KC_CAPS);
     }
 
-    // Set lighting based on individully held key
-    if(r_alt_down) {
-      show_window_snap_keys();
-    }
+    leader_end();
+  }
 };
 
 #define MODS_SHIFT  (get_mods() & MOD_BIT(KC_LSHIFT) || get_mods() & MOD_BIT(KC_RSHIFT))
