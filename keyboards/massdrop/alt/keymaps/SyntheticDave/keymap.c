@@ -1,7 +1,5 @@
 #include QMK_KEYBOARD_H
 
-#include <print.h>
-
 enum layers {
   DEFAULT = 0,
   MAC = 1,
@@ -39,9 +37,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     ),
     [MAC_SPECIAL] = LAYOUT_65_ansi_blocker(
         KC_GRV,  KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,  _______, KC_MUTE, \
-        _______, _______, _______, _______, _______, _______, _______, U_T_AUTO,U_T_AGCR,_______, KC_PSCR, KC_SLCK, KC_PAUS, _______, KC_END, \
-        _______, _______,_______, _______, _______, _______, _______, _______, _______, _______, HYPR(KC_S), HYPR(KC_P),          _______, KC_VOLU, \
-        _______, _______, _______, _______, _______, MD_BOOT, NK_TOGG, DBG_TOG, HYPR(KC_LBRC), HYPR(KC_RBRC), HYPR(KC_I), _______,          KC_PGUP, KC_VOLD, \
+        _______, _______, _______, _______, _______, _______, _______, U_T_AUTO,U_T_AGCR,_______, C(G(KC_LEFT)),A(S(KC_LBRC)),A(S(KC_RBRC)),C(G(KC_RIGHT)), KC_END, \
+        KC_CAPS, _______,_______, _______, _______, _______, _______, _______, _______, _______, HYPR(KC_S), HYPR(KC_P),          _______, KC_VOLU, \
+        _______, _______, _______, _______, _______, MD_BOOT, NK_TOGG, DBG_TOG, HYPR(KC_LBRC), HYPR(KC_RBRC), HYPR(KC_I), _______, KC_PGUP, KC_VOLD, \
         _______, _______, _______,                            _______,                            _______, _______, KC_HOME, KC_PGDN, KC_END  \
     ),
     [WIN] = LAYOUT_65_ansi_blocker(
@@ -60,10 +58,10 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     ),
     [WIN_SPECIAL] = LAYOUT_65_ansi_blocker(
         KC_GRV,  KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,  _______, _______, \
-        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, \
-        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          _______, _______, \
-        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          _______, _______, \
-        _______, _______, _______,                            _______,                            _______, _______, _______, _______, _______  \
+        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, KC_END, \
+        KC_CAPS, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          _______, _______, \
+        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          KC_PGUP, _______, \
+        _______, _______, _______,                            _______,                            _______, _______, KC_HOME, KC_PGDN, KC_END  \
     ),
     [RGB_CONFIG] = LAYOUT_65_ansi_blocker(
         _______,  _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,  _______,  _______,  _______, _______, \
@@ -131,6 +129,14 @@ void show_mac_window_snap_keys(void) {
   rgb_matrix_set_collection_color(unlit_keys, sizeof(unlit_keys) / sizeof(uint8_t), 0,0,0);
 }
 
+void show_vs_code_keys(void) {
+  uint8_t lit_keys[] = {25,26,27,28};
+  // uint8_t unlit_keys[] = {};
+
+  rgb_matrix_set_collection_color(lit_keys, sizeof(lit_keys) / sizeof(uint8_t), RGB_BLUE);
+  // rgb_matrix_set_collection_color(unlit_keys, sizeof(unlit_keys) / sizeof(uint8_t), 0,0,0);
+}
+
 void show_win_base_keys(void) {
   rgb_matrix_set_color(60, RGB_BLUE);
 }
@@ -162,6 +168,7 @@ void matrix_scan_user(void) {
   switch (layer) {
     case MAC_SPECIAL:
       show_mac_gpm_keys();
+      show_vs_code_keys();
     case MAC:
       show_mac_base_keys();
       break;
