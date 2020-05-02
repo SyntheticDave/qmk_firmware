@@ -105,8 +105,14 @@ void rgb_matrix_set_collection_color(uint8_t keys[], int keyCount, uint8_t red, 
   }
 };
 
+void show_base_leds(uint8_t red, uint8_t green, uint8_t blue) {
+    uint8_t lit_keys[] = {67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,103,104,105};
+    rgb_matrix_set_collection_color(lit_keys, sizeof(lit_keys) / sizeof(uint8_t), red, green, blue);
+}
+
 void show_mac_base_keys(void) {
   rgb_matrix_set_color(60, RGB_MAGENTA);
+  show_base_leds(RGB_MAGENTA);
 }
 
 void show_mac_gpm_keys(void) {
@@ -138,11 +144,12 @@ void show_vs_code_keys(void) {
 }
 
 void show_win_base_keys(void) {
-  rgb_matrix_set_color(60, RGB_BLUE);
+  rgb_matrix_set_color(60, RGB_BLUE);   // Set meta key to blue
+  show_base_leds(RGB_BLUE);
 }
 
 void show_win_gaming_keys(void) {
-  // Light up WASD and disable windows button
+  // Light up WASD and disable windows button light
   uint8_t lit_keys[] = {17, 31, 32, 33};
   uint8_t unlit_keys[] = {60};
 
@@ -153,8 +160,7 @@ void show_win_gaming_keys(void) {
 void show_layer_indicator(int layer) {
   // Layer indicator to help me keep my bearings
   if(layer > 0) {
-    rgb_matrix_set_color(layer, RGB_MAGENTA);
-    // rgb_matrix_set_color(63, RGB_MAGENTA); // Fn key
+    rgb_matrix_set_color(layer, RGB_WHITE);
   }
 }
 
@@ -190,9 +196,8 @@ void matrix_scan_user(void) {
   LEADER_DICTIONARY() {
     leading = false;
 
-    // Activate CapsLock on double tapping the leader key
-    SEQ_ONE_KEY(KC_LEAD) {
-      register_code(KC_CAPS);
+    SEQ_ONE_KEY(KC_GESC) {
+      layer_clear(); // Disable all layers except base
     }
     SEQ_ONE_KEY(KC_M) {
       layer_move(MAC);	 // Activate Mac OS Layer (only)
@@ -200,10 +205,11 @@ void matrix_scan_user(void) {
     SEQ_ONE_KEY(KC_W) {
       layer_move(WIN); // Activate Windows Layer (only)
     }
-    SEQ_TWO_KEYS(KC_W, KC_G) {
+    SEQ_TWO_KEYS(KC_G, KC_G) {
       layer_move(WIN); // Activate Windows Layer (only)
       layer_on(WIN_GAMING); // Then activate the gaming layer
-    }    SEQ_TWO_KEYS(KC_K, KC_L) {
+    }
+    SEQ_TWO_KEYS(KC_K, KC_L) {
       layer_invert(RGB_CONFIG); // Toggle the lighting config layer
     }
 
