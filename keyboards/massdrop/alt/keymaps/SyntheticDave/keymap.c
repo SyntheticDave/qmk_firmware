@@ -110,149 +110,207 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 LEADER_EXTERNS();
 
 void keyboard_post_init_user(void) {
-  // Customise these values to desired behaviour
-  debug_enable=true;
-  debug_matrix=true;
-  //debug_keyboard=true;
-  //debug_mouse=true;
+    // Customise these values to desired behaviour
+    debug_enable = true;
+    debug_matrix = true;
+    // debug_keyboard=true;
+    // debug_mouse=true;
+    print("keyboard started\n");
 }
+
 
 // Runs just one time when the keyboard initializes.
-void matrix_init_user(void) {
-};
+void matrix_init_user(void) { print("keyboard starting\n"); };
 
 bool r_alt_down = false;
+bool meta_down = false;
 
 // Sets a list of keys to the same color
-void rgb_matrix_set_collection_color(uint8_t keys[], int keyCount, uint8_t red, uint8_t green, uint8_t blue){
-  for (int i = 0; i < keyCount; i++) {
-    rgb_matrix_set_color(keys[i], red, green, blue);
-  }
+void rgb_matrix_set_collection_color(uint8_t keys[], int keyCount, uint8_t red, uint8_t green, uint8_t blue) {
+    for (int i = 0; i < keyCount; i++) {
+        rgb_matrix_set_color(keys[i], red, green, blue);
+    }
 };
 
-void show_base_leds(uint8_t red, uint8_t green, uint8_t blue) {
-    uint8_t lit_keys[] = {67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,103,104,105};
-    rgb_matrix_set_collection_color(lit_keys, sizeof(lit_keys) / sizeof(uint8_t), red, green, blue);
+void key_leds_off(bool top_row) {
+    if(top_row) {
+        rgb_matrix_set_collection_color(key_leds_no_top_row, sizeof(key_leds_no_top_row) / sizeof(uint8_t), RGB_OFF);
+    } else {
+        rgb_matrix_set_collection_color(key_leds, sizeof(key_leds) / sizeof(uint8_t), RGB_OFF);
+    }
 }
 
-void show_mac_base_keys(void) {
-  rgb_matrix_set_color(60, RGB_MAGENTA);
-  show_base_leds(RGB_MAGENTA);
+void show_mac_base_leds(void) {
+    rgb_matrix_set_collection_color(base_leds_back, sizeof(base_leds_back) / sizeof(uint8_t), RGB_MAGENTA);
 }
 
-void show_mac_gpm_keys(void) {
-  uint8_t lit_keys[] = {54, 53, 52, 41, 40};
-  uint8_t unlit_keys[] = {25, 26, 27, 38, 39, 51};
-
-  rgb_matrix_set_collection_color(lit_keys, sizeof(lit_keys) / sizeof(uint8_t), RGB_GPM_ORANGE);
-  rgb_matrix_set_collection_color(unlit_keys, sizeof(unlit_keys) / sizeof(uint8_t), 0,0,0);
+void show_mac_gpm_leds(void) {
+    uint8_t lit_keys[]   = {54, 53, 52, 41, 40};
+    rgb_matrix_set_collection_color(lit_keys, sizeof(lit_keys) / sizeof(uint8_t), RGB_GPM_ORANGE);
 }
+
+void show_mac_vs_code_leds(void) {
+    uint8_t lit_keys[] = {25, 26, 27, 28, 42};
+    rgb_matrix_set_collection_color(lit_keys, sizeof(lit_keys) / sizeof(uint8_t), RGB_BLUE);
+}
+
+void show_mac_special_leds(void) {
+    key_leds_off(true);
+    show_mac_gpm_leds();
+    show_mac_vs_code_leds();
+}
+
+void show_mac_meta_leds(void) {
+    rgb_matrix_set_color(16, RGB_RED);  // Q Key
+    rgb_matrix_set_color(17, RGB_YELLOW);  // W Key
+}
+
 
 void show_mac_window_snap_keys(void) {
-  // Window snapping cluster
-  // TODO: Choose highlight colour based on the current colour.
-  //        I'm not sure how to read current values
-  // Want to show a different colour if key was already white
-  uint8_t lit_keys[] = {54, 53, 52, 41, 40, 28, 27, 26};
-  uint8_t unlit_keys[] = {11, 12, 13, 25, 38, 39, 42, 51};
+    // Window snapping cluster
+    // TODO: Choose highlight colour based on the current colour.
+    //        I'm not sure how to read current values
+    // Want to show a different colour if key was already white
+    uint8_t lit_keys[]   = {54, 53, 52, 41, 40, 28, 27, 26};
+    uint8_t unlit_keys[] = {11, 12, 13, 25, 38, 39, 42, 51};
 
-  rgb_matrix_set_collection_color(lit_keys, sizeof(lit_keys) / sizeof(uint8_t), RGB_WHITE);
-  rgb_matrix_set_collection_color(unlit_keys, sizeof(unlit_keys) / sizeof(uint8_t), 0,0,0);
+    rgb_matrix_set_collection_color(lit_keys, sizeof(lit_keys) / sizeof(uint8_t), RGB_WHITE);
+    rgb_matrix_set_collection_color(unlit_keys, sizeof(unlit_keys) / sizeof(uint8_t), 0, 0, 0);
 }
 
-void show_vs_code_keys(void) {
-  uint8_t lit_keys[] = {25,26,27,28};
-  // uint8_t unlit_keys[] = {};
-
-  rgb_matrix_set_collection_color(lit_keys, sizeof(lit_keys) / sizeof(uint8_t), RGB_BLUE);
-  // rgb_matrix_set_collection_color(unlit_keys, sizeof(unlit_keys) / sizeof(uint8_t), 0,0,0);
+void show_win_base_leds(void) {
+    rgb_matrix_set_collection_color(base_leds_back, sizeof(base_leds_back) / sizeof(uint8_t), RGB_BLUE);
 }
 
-void show_win_base_keys(void) {
-  rgb_matrix_set_color(60, RGB_BLUE);   // Set meta key to blue
-  show_base_leds(RGB_BLUE);
-}
+void show_win_gaming_leds(void) {
+    // Light up WASD and disable windows button light
+    uint8_t lit_keys[]   = {17, 31, 32, 33};
+    uint8_t unlit_keys[] = {60};
 
-void show_win_gaming_keys(void) {
-  // Light up WASD and disable windows button light
-  uint8_t lit_keys[] = {17, 31, 32, 33};
-  uint8_t unlit_keys[] = {60};
-
-  rgb_matrix_set_collection_color(lit_keys, sizeof(lit_keys) / sizeof(uint8_t), RGB_RED);
-  rgb_matrix_set_collection_color(unlit_keys, sizeof(unlit_keys) / sizeof(uint8_t), 0,0,0);
+    rgb_matrix_set_collection_color(lit_keys, sizeof(lit_keys) / sizeof(uint8_t), RGB_RED);
+    rgb_matrix_set_collection_color(unlit_keys, sizeof(unlit_keys) / sizeof(uint8_t), 0, 0, 0);
 }
 
 void show_layer_indicator(int layer) {
-  // Layer indicator to help me keep my bearings
-  if(layer > 0) {
-    rgb_matrix_set_color(layer, RGB_WHITE);
-  }
+    // Layer indicator to help me keep my bearings
+    if (layer > 0) {
+        rgb_matrix_set_color(layer, RGB_WHITE);
+    }
+}
+
+void show_win_media_control_leds(void) {
+    uint8_t lit_keys[]   = {53, 52, 41, 40};
+    rgb_matrix_set_collection_color(lit_keys, sizeof(lit_keys) / sizeof(uint8_t), RGB_GPM_ORANGE);
+}
+
+void show_win_special_leds(void) {
+    key_leds_off(true);
+    rgb_matrix_set_color(16, RGB_RED);  // Q Key Shutdown
+    rgb_matrix_set_color(17, RGB_YELLOW);  // W Key - Sleep
+    show_win_media_control_leds();
+}
+
+void show_kb_config_keys(void) {
+    key_leds_off(false);
+
+    //RGB CYCLE
+    rgb_matrix_set_color(31, RGB_BLUE);   // cycle left
+    rgb_matrix_set_color(33, RGB_BLUE);   // cycle right
+
+    //RGB VALUE
+    rgb_matrix_set_color(17, RGB_WHITE);        // value up
+    rgb_matrix_set_color(32, 0x5A,0x5A,0x5A);   // value down
+
+    //RGB HUE
+    rgb_matrix_set_color(19, RGB_MAGENTA);      // hue up
+    rgb_matrix_set_color(34, RGB_TEAL);         // hue down
+
+    //RGB SAT
+    rgb_matrix_set_color(20, RGB_RED);          // sat up
+    rgb_matrix_set_color(35, RGB_WHITE);        // sat down
+
+    //RGB SPEED
+    rgb_matrix_set_color(16, RGB_YELLOW);        // slower
+    rgb_matrix_set_color(18, RGB_YELLOW);        // faster
+
+    // Light KL, as they're the exit keys for this layer
+    rgb_matrix_set_color(38, 0x5A,0x5A,0x5A);
+    rgb_matrix_set_color(39, 0x5A,0x5A,0x5A);
 }
 
 // Runs constantly in the background, in a loop.
 void matrix_scan_user(void) {
-  // Find the current layer
-  uint8_t layer = biton32(layer_state);
+    // Find the current layer
+    uint8_t layer = biton32(layer_state);
 
-  // Set lighting based on the current layer
-  show_layer_indicator(layer);
-  switch (layer) {
-    case MAC_SPECIAL:
-      show_mac_gpm_keys();
-      show_vs_code_keys();
-    case MAC:
-      show_mac_base_keys();
-      break;
-    case WIN_SPECIAL:
-    case WIN:
-      show_win_base_keys();
-      break;
-    case WIN_GAMING:
-      show_win_gaming_keys();
-      break;
-  }
-
-  // Set lighting based on individully held key
-  if(r_alt_down && layer == MAC) {
-    show_mac_window_snap_keys();
-  }
-
-  // Handle Leader Key Behaviour
-  LEADER_DICTIONARY() {
-    leading = false;
-
-    SEQ_ONE_KEY(KC_GESC) {
-      layer_clear(); // Disable all layers except base
-    }
-    SEQ_ONE_KEY(KC_M) {
-      layer_move(MAC);	 // Activate Mac OS Layer (only)
-    }
-    SEQ_ONE_KEY(KC_W) {
-      layer_move(WIN); // Activate Windows Layer (only)
-    }
-    SEQ_TWO_KEYS(KC_G, KC_G) {
-      layer_move(WIN); // Activate Windows Layer (only)
-      layer_on(WIN_GAMING); // Then activate the gaming layer
-    }
-    SEQ_TWO_KEYS(KC_K, KC_L) {
-      layer_invert(RGB_CONFIG); // Toggle the lighting config layer
+    // Set lighting based on the current layer
+    switch (layer) {
+        case MAC_SPECIAL:
+            show_mac_special_leds();
+        case MAC:
+            show_mac_base_leds();
+            break;
+        case WIN_SPECIAL:
+            show_win_special_leds();
+        case WIN:
+            show_win_base_leds();
+            break;
+        case WIN_GAMING:
+            show_win_base_leds();
+            show_win_gaming_leds();
+            break;
+        case KB_CONFIG:
+            show_kb_config_keys();
+            break;
     }
 
-    leader_end();
-  }
+    // Set lighting based on individully held key
+    if (r_alt_down && layer == MAC) {
+        show_mac_window_snap_keys();
+    }
+
+    if (meta_down && layer == MAC) {
+        show_mac_meta_leds();
+    }
+
+    show_layer_indicator(layer);
+
+    // Handle Leader Key Behaviour
+    LEADER_DICTIONARY() {
+        leading = false;
+
+        SEQ_ONE_KEY(KC_GESC) {
+            layer_clear();  // Disable all layers except base
+        }
+        SEQ_ONE_KEY(KC_M) {
+            layer_move(MAC);  // Activate Mac OS Layer (only)
+        }
+        SEQ_ONE_KEY(KC_W) {
+            layer_move(WIN);  // Activate Windows Layer (only)
+        }
+        SEQ_TWO_KEYS(KC_G, KC_G) {
+            layer_move(WIN);       // Activate Windows Layer (only)
+            layer_on(WIN_GAMING);  // Then activate the gaming layer
+        }
+        SEQ_TWO_KEYS(KC_K, KC_L) {
+            layer_invert(KB_CONFIG);  // Toggle the lighting config layer
+        }
+
+        leader_end();
+    }
 };
 
-#define MODS_SHIFT  (get_mods() & MOD_BIT(KC_LSHIFT) || get_mods() & MOD_BIT(KC_RSHIFT))
-#define MODS_CTRL  (get_mods() & MOD_BIT(KC_LCTL) || get_mods() & MOD_BIT(KC_RCTRL))
-#define MODS_ALT  (get_mods() & MOD_BIT(KC_LALT) || get_mods() & MOD_BIT(KC_RALT))
+#define MODS_SHIFT (get_mods() & MOD_BIT(KC_LSHIFT) || get_mods() & MOD_BIT(KC_RSHIFT))
+#define MODS_CTRL (get_mods() & MOD_BIT(KC_LCTL) || get_mods() & MOD_BIT(KC_RCTRL))
+#define MODS_ALT (get_mods() & MOD_BIT(KC_LALT) || get_mods() & MOD_BIT(KC_RALT))
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     static uint32_t key_timer;
 
-      // If console is enabled, it will print the matrix position and status of each key pressed
-      #ifdef CONSOLE_ENABLE
-          uprintf("KL: kc: %u, col: %u, row: %u, pressed: %u\n", keycode, record->event.key.col, record->event.key.row, record->event.pressed);
-      #endif
+// If console is enabled, it will print the matrix position and status of each key pressed
+#ifdef CONSOLE_ENABLE
+    uprintf("KL: kc: %u, col: %u, row: %u, pressed: %u\n", keycode, record->event.key.col, record->event.key.row, record->event.pressed);
+#endif
 
     switch (keycode) {
         case U_T_AUTO:
@@ -296,34 +354,42 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             return false;
         case RGB_TOG:
             if (record->event.pressed) {
-              switch (rgb_matrix_get_flags()) {
-                case LED_FLAG_ALL: {
-                    rgb_matrix_set_flags(LED_FLAG_KEYLIGHT);
-                    rgb_matrix_set_color_all(0, 0, 0);
-                  }
-                  break;
-                case LED_FLAG_KEYLIGHT: {
-                    rgb_matrix_set_flags(LED_FLAG_UNDERGLOW);
-                    rgb_matrix_set_color_all(0, 0, 0);
-                  }
-                  break;
-                case LED_FLAG_UNDERGLOW: {
-                    rgb_matrix_set_flags(LED_FLAG_NONE);
-                    rgb_matrix_disable_noeeprom();
-                  }
-                  break;
-                default: {
-                    rgb_matrix_set_flags(LED_FLAG_ALL);
-                    rgb_matrix_enable_noeeprom();
-                  }
-                  break;
-              }
+                switch (rgb_matrix_get_flags()) {
+                    case LED_FLAG_ALL: {
+                        rgb_matrix_set_flags(LED_FLAG_KEYLIGHT);
+                        rgb_matrix_set_color_all(0, 0, 0);
+                    } break;
+                    case LED_FLAG_KEYLIGHT: {
+                        rgb_matrix_set_flags(LED_FLAG_UNDERGLOW);
+                        rgb_matrix_set_color_all(0, 0, 0);
+                    } break;
+                    case LED_FLAG_UNDERGLOW: {
+                        rgb_matrix_set_flags(LED_FLAG_NONE);
+                        rgb_matrix_disable_noeeprom();
+                    } break;
+                    default: {
+                        rgb_matrix_set_flags(LED_FLAG_ALL);
+                        rgb_matrix_enable_noeeprom();
+                    } break;
+                }
             }
             return false;
         case KC_RALT:
-          r_alt_down = record->event.pressed;
-          return true;
+            r_alt_down = record->event.pressed;
+            return true;
+        case KC_LCMD:
+          meta_down = record->event.pressed;
         default:
-            return true; //Process all other keycodes normally
+            return true;  // Process all other keycodes normally
+    }
+}
+
+void rgb_matrix_indicators_user(void)
+{
+	uint8_t this_led = host_keyboard_leds();
+
+    if (this_led & (1 << USB_LED_CAPS_LOCK)) {
+
+        rgb_matrix_set_collection_color(base_leds_left, sizeof(base_leds_left) / sizeof(uint8_t), RGB_RED);
     }
 }
