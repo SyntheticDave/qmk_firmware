@@ -123,6 +123,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define RGB_MATRIX_KEYPRESSES
 #define RGB_MATRIX_LED_PROCESS_LIMIT 15
 #define RGB_MATRIX_LED_FLUSH_LIMIT 10
+#define RGB_MATRIX_STARTUP_MODE RGB_MATRIX_SOLID_REACTIVE
+#define RGB_MATRIX_STARTUP_HUE 180 // Blue Purple
+#define RGB_MATRIX_STARTUP_SAT 255 // Full Saturation
+#define RGB_MATRIX_STARTUP_VAL RGB_MATRIX_MAXIMUM_BRIGHTNESS
+#define RGB_MATRIX_STARTUP_SPD 25  // Slow animation speed
 
 // Always send Escape if CTRL pressed (so CTRL + SHIFT + ESC still works in Windows)
 #define GRAVE_ESC_CTRL_OVERRIDE
