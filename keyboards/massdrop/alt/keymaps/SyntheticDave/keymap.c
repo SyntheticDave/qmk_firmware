@@ -1,73 +1,89 @@
 #include QMK_KEYBOARD_H
 
-enum layers {
-  DEFAULT = 0,
-  MAC = 1,
-  MAC_SPECIAL = 2,
-  WIN = 3,
-  WIN_GAMING = 4,
-  WIN_SPECIAL = 5,
-  RGB_CONFIG = 6
-};
+#include <print.h>
+
+enum layers { DEFAULT = 0, MAC, MAC_SPECIAL, WIN, WIN_GAMING, WIN_SPECIAL, KB_CONFIG };
 
 enum alt_keycodes {
-    U_T_AUTO = SAFE_RANGE, //USB Extra Port Toggle Auto Detect / Always Active
-    U_T_AGCR,              //USB Toggle Automatic GCR control
-    DBG_TOG,               //DEBUG Toggle On / Off
-    DBG_MTRX,              //DEBUG Toggle Matrix Prints
-    DBG_KBD,               //DEBUG Toggle Keyboard Prints
-    DBG_MOU,               //DEBUG Toggle Mouse Prints
-    MD_BOOT,               //Restart into bootloader after hold timeout
+    U_T_AUTO = SAFE_RANGE,  // USB Extra Port Toggle Auto Detect / Always Active
+    U_T_AGCR,               // USB Toggle Automatic GCR control
+    DBG_TOG,                // DEBUG Toggle On / Off
+    DBG_MTRX,               // DEBUG Toggle Matrix Prints
+    DBG_KBD,                // DEBUG Toggle Keyboard Prints
+    DBG_MOU,                // DEBUG Toggle Mouse Prints
+    MD_BOOT,                // Restart into bootloader after hold timeout
 };
+
+uint8_t all_leds[] = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101};
+uint8_t key_leds[] = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66};
+uint8_t key_leds_no_top_row[] = {15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66};
+uint8_t base_leds[] = {67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,103,104};
+uint8_t base_leds_front[] = {67,68,69,70,71,72,73,74,75,76,77,78,79,80,81};
+uint8_t base_leds_right[] = {82,83,84,85};
+uint8_t base_leds_back[] = {86,87,88,89,90,91,92,93,94,95,96,97,98,99,100};
+uint8_t base_leds_left[] = {101,102,103,104};
+
+#define CG_LEFT C(G(KC_LEFT))   // Ctrl + Meta + Left Arrow - Move Code Panel Left
+#define CG_RGHT C(G(KC_RIGHT))   // Ctrl + Meta + Right Arrow - Move Code Panel Right
+#define AS_LBRC A(S(KC_LBRC))   // Alt + Shift + [ - Move to Left Panel
+#define AS_RBRC A(S(KC_RBRC))   // Alt + Shift + ] - Move to Right Panel
+#define HYPR_KS HYPR(KC_S)      // GPM Focus
+#define HYPR_KP HYPR(KC_P)      // GPM Track Play/Pause
+#define HYPR_KI HYPR(KC_I)      // GPM Track Info
+#define HYPR_LB HYPR(KC_LBRC)   // GPM Track Back
+#define HYPR_RB HYPR(KC_RBRC)   // GPM Track Forward
+#define SA_QUOT S(A(KC_QUOT))   // Alt + Shift + ' - VS Code Terminal Focus
+#define WIN_S MO(WIN_SPECIAL)
+#define MAC_S MO(MAC_SPECIAL)
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [DEFAULT] = LAYOUT_65_ansi_blocker(
-        KC_GESC,  KC_1,    KC_2,    KC_3,    KC_4,    KC_5,    KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    KC_MINS, KC_EQL,  KC_BSPC, KC_DEL,  \
+        KC_GESC, KC_1,    KC_2,    KC_3,    KC_4,    KC_5,    KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    KC_MINS, KC_EQL,  KC_BSPC, KC_DEL,  \
         KC_TAB,  KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,    KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    KC_LBRC, KC_RBRC, KC_BSLS, KC_HOME, \
         KC_LEAD, KC_A,    KC_S,    KC_D,    KC_F,    KC_G,    KC_H,    KC_J,    KC_K,    KC_L,    KC_SCLN, KC_QUOT,          KC_ENT,  KC_PGUP, \
         KC_LSPO, KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,    KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH, KC_RSPC,          KC_UP,   KC_PGDN, \
-        KC_LCTL, KC_LALT, KC_LGUI,                            KC_SPC,                             KC_RALT, KC_RGUI,   KC_LEFT, KC_DOWN, KC_RGHT  \
+        KC_LCTL, KC_LALT, KC_LGUI,                            KC_SPC,                             KC_RALT, KC_RGUI, KC_LEFT, KC_DOWN, KC_RGHT  \
     ),
     [MAC] = LAYOUT_65_ansi_blocker(
         _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, \
         _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, \
         _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          _______, _______, \
         _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          _______, _______, \
-        _______, _______, _______,                            _______,                            _______, MO(MAC_SPECIAL), _______, _______, _______  \
+        _______, _______, _______,                            _______,                            _______, MAC_S  , _______, _______, _______  \
     ),
     [MAC_SPECIAL] = LAYOUT_65_ansi_blocker(
-        KC_GRV,  KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,  _______, KC_MUTE, \
-        _______, _______, _______, _______, _______, _______, _______, U_T_AUTO,U_T_AGCR,_______, C(G(KC_LEFT)),A(S(KC_LBRC)),A(S(KC_RBRC)),C(G(KC_RIGHT)), KC_END, \
-        KC_CAPS, _______,_______, _______, _______, _______, _______, _______, _______, _______, HYPR(KC_S), HYPR(KC_P),          _______, KC_VOLU, \
-        _______, _______, _______, _______, _______, MD_BOOT, NK_TOGG, DBG_TOG, HYPR(KC_LBRC), HYPR(KC_RBRC), HYPR(KC_I), _______, KC_PGUP, KC_VOLD, \
-        _______, _______, _______,                            _______,                            _______, _______, KC_HOME, KC_PGDN, KC_END  \
+        KC_GRV ,  KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,  _______, KC_MUTE, \
+        _______, _______, _______, _______, _______, _______, _______, U_T_AUTO,U_T_AGCR, _______, CG_LEFT, AS_LBRC, AS_RBRC, CG_RGHT, KC_END,  \
+        KC_CAPS, _______, _______, _______, _______, _______, _______, _______, _______,  _______, HYPR_KS, HYPR_KP,          SA_QUOT, KC_VOLU, \
+        _______, _______, _______, _______, _______, _______, _______, _______, HYPR_LB, HYPR_RB , HYPR_KI, _______,          KC_PGUP, KC_VOLD, \
+        _______, _______, _______,                            _______,                             _______, _______, KC_HOME, KC_PGDN, KC_END   \
     ),
     [WIN] = LAYOUT_65_ansi_blocker(
         _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, \
         _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, \
         _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          _______, _______, \
         _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          _______, _______, \
-        _______, _______, _______,                            _______,                            _______, MO(WIN_SPECIAL), _______, _______, _______  \
+        _______, _______, _______,                            _______,                            _______,  WIN_S , _______, _______, _______  \
     ),
     [WIN_GAMING] = LAYOUT_65_ansi_blocker(
         _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, \
         _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, \
         _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          _______, _______, \
         _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          _______, _______, \
-        _______, _______, KC_NO,                            _______,                            _______, MO(WIN_SPECIAL), _______, _______, _______  \
+        _______, _______, KC_NO,                            _______,                              _______,  WIN_S , _______, _______, _______  \
     ),
     [WIN_SPECIAL] = LAYOUT_65_ansi_blocker(
         KC_GRV,  KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,  _______, _______, \
-        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, KC_END, \
-        KC_CAPS, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          _______, _______, \
-        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          KC_PGUP, _______, \
+        _______, KC_PWR , KC_SLEP, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, KC_END , \
+        KC_CAPS, _______, _______, _______, _______, _______, _______, _______, _______, _______, KC_MSEL, KC_MPLY,          _______, _______, \
+        _______, _______, _______, _______, _______, _______, _______, _______, _______, KC_MPRV, KC_MNXT, _______,          KC_PGUP, _______, \
         _______, _______, _______,                            _______,                            _______, _______, KC_HOME, KC_PGDN, KC_END  \
     ),
-    [RGB_CONFIG] = LAYOUT_65_ansi_blocker(
-        _______,  _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,  _______,  _______,  _______, _______, \
-        _______, RGB_SPD, RGB_VAI, RGB_SPI, RGB_HUI, RGB_SAI, _______, _______,_______,_______, _______, _______, _______, _______, _______, \
+    [KB_CONFIG] = LAYOUT_65_ansi_blocker(
+        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, \
+        _______, RGB_SPD, RGB_VAI, RGB_SPI, RGB_HUI, RGB_SAI, _______, _______, _______, _______, _______, _______, _______, _______, _______, \
         _______, RGB_RMOD,RGB_VAD, RGB_MOD, RGB_HUD, RGB_SAD, _______, _______, _______, _______, _______, _______,          _______, _______, \
-        _______, RGB_TOG, RGB_M_P, RGB_M_R, _______, _______, _______, _______, _______, _______, _______, _______,          _______, _______, \
+        _______, RGB_TOG, RGB_M_P, RGB_M_R, _______, MD_BOOT, NK_TOGG, DBG_TOG, _______, _______, _______, _______,          _______, _______, \
         _______, _______, _______,                            _______,                            _______, _______, _______, _______, _______  \
     ),
 
@@ -79,6 +95,15 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          _______, _______, \
         _______, _______, _______,                            _______,                            _______, _______, _______, _______, _______  \
     ),
+
+    [X] = RGB INDEX (
+        ESC 0 , ONE 1  , TWO 2  , THR 3  , FOR 4  , FVE 5  , SIX 6  ,  SVN 7 ,  EHT 8  , NIN  9 , ZRO 10 ,  -_ 11 ,  =+ 12 , BPSC 13, DEL 14 , \
+        TAB 15,  Q  16 ,  W  17 ,  E  18 ,  R  19 ,  T  20 ,  Y  21 ,  U  22 ,  I  23  ,  O  24 ,  P 25  ,  [{ 26 ,  ]} 27 , \|  28 , HME 29 , \
+        CAP 30,  A  31 ,  S  32 ,  D  33 ,  F  34 ,  G  35 ,  H  36 ,  J  37 ,  K  38  ,  L  39 ,  ;: 40 ,  '" 41 ,          ENT 42 , PGUP 43, \
+        SFT 44,  Z  45 ,  X  46 ,  C  47 ,  V  48 ,  B  49 ,  N  50 ,  M  51 , ,<  52  , .>  53 ,  /? 54 , RSFT 55,          UP  56 , PGDN 57, \
+        CTL 58, ALT 59 , GUI 60 ,                            SPC 61 ,                             ALT 62 ,  FN 63 , LEFT 64, DOWN 65, RGHT 66  \
+    ),
+
     */
 };
 
