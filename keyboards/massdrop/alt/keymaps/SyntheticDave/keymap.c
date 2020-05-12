@@ -12,6 +12,7 @@ enum alt_keycodes {
     DBG_KBD,                // DEBUG Toggle Keyboard Prints
     DBG_MOU,                // DEBUG Toggle Mouse Prints
     MD_BOOT,                // Restart into bootloader after hold timeout
+    RGB_WRK,                // Set RGB to white (for work)
 };
 
 uint8_t all_leds[] = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101};
@@ -22,6 +23,7 @@ uint8_t base_leds_front[] = {67,68,69,70,71,72,73,74,75,76,77,78,79,80,81};
 uint8_t base_leds_right[] = {82,83,84,85};
 uint8_t base_leds_back[] = {86,87,88,89,90,91,92,93,94,95,96,97,98,99,100};
 uint8_t base_leds_left[] = {101,102,103,104};
+uint8_t arrow_keys[] = {56,64,65,66};
 
 #define CG_LEFT C(G(KC_LEFT))   // Ctrl + Meta + Left Arrow - Move Code Panel Left
 #define CG_RGHT C(G(KC_RIGHT))   // Ctrl + Meta + Right Arrow - Move Code Panel Right
@@ -81,9 +83,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     ),
     [KB_CONFIG] = LAYOUT_65_ansi_blocker(
         _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, \
-        _______, RGB_SPD, RGB_VAI, RGB_SPI, RGB_HUI, RGB_SAI, _______, _______, _______, _______, _______, _______, _______, _______, _______, \
-        _______, RGB_RMOD,RGB_VAD, RGB_MOD, RGB_HUD, RGB_SAD, _______, _______, _______, _______, _______, _______,          _______, _______, \
-        _______, RGB_TOG, RGB_M_P, RGB_M_R, _______, MD_BOOT, NK_TOGG, DBG_TOG, _______, _______, _______, _______,          _______, _______, \
+        _______, RGB_HUI, RGB_SAI, RGB_VAI, RGB_MOD, RGB_SPI, _______, _______, _______, _______, _______, _______, _______, _______, _______, \
+        _______, RGB_HUD, RGB_SAD, RGB_VAD,RGB_RMOD, RGB_SPD, _______, _______, _______, _______, _______, _______,          _______, _______, \
+        _______, _______, RGB_WRK, RGB_TOG, _______, MD_BOOT, NK_TOGG, DBG_TOG, _______, _______, _______, _______,          _______, _______, \
         _______, _______, _______,                            _______,                            _______, _______, _______, _______, _______  \
     ),
 
@@ -124,6 +126,12 @@ void matrix_init_user(void) { print("keyboard starting\n"); };
 
 bool r_alt_down = false;
 bool meta_down = false;
+bool work_mode = false;
+
+// HACK: Can't figure out how to determine current hue/saturation, so using this workaround
+void toggle_work_mode(void) {
+    work_mode = !work_mode;
+}
 
 // Sets a list of keys to the same color
 void rgb_matrix_set_collection_color(uint8_t keys[], int keyCount, uint8_t red, uint8_t green, uint8_t blue) {
@@ -154,10 +162,16 @@ void show_mac_vs_code_leds(void) {
     rgb_matrix_set_collection_color(lit_keys, sizeof(lit_keys) / sizeof(uint8_t), RGB_BLUE);
 }
 
+void show_arrow_leds(uint8_t red, uint8_t green, uint8_t blue) {
+    uint8_t lit_keys[] = {56,64,65,66};
+    rgb_matrix_set_collection_color(lit_keys, sizeof(lit_keys) / sizeof(uint8_t), red, green, blue);
+}
+
 void show_mac_special_leds(void) {
     key_leds_off(true);
     show_mac_gpm_leds();
     show_mac_vs_code_leds();
+    show_arrow_leds(RGB_WHITE);
 }
 
 void show_mac_meta_leds(void) {
@@ -166,15 +180,15 @@ void show_mac_meta_leds(void) {
 }
 
 void show_mac_window_snap_keys(void) {
-    // Window snapping cluster
-    // TODO: Choose highlight colour based on the current colour.
-    //        I'm not sure how to read current values
-    // Want to show a different colour if key was already white
     uint8_t lit_keys[]   = {54, 53, 52, 41, 40, 28, 27, 26};
-    uint8_t unlit_keys[] = {11, 12, 13, 25, 38, 39, 42, 51};
 
-    rgb_matrix_set_collection_color(lit_keys, sizeof(lit_keys) / sizeof(uint8_t), RGB_WHITE);
-    rgb_matrix_set_collection_color(unlit_keys, sizeof(unlit_keys) / sizeof(uint8_t), 0, 0, 0);
+    // HACK: Using this to show snap keys as different colour.
+    // Would be much better if we could just read the current hue/sat
+    if(work_mode) {
+        rgb_matrix_set_collection_color(lit_keys, sizeof(lit_keys) / sizeof(uint8_t), RGB_PURPLE);
+    } else {
+        rgb_matrix_set_collection_color(lit_keys, sizeof(lit_keys) / sizeof(uint8_t), RGB_WHITE);
+    }
 }
 
 void show_win_base_leds(void) {
@@ -188,6 +202,7 @@ void show_win_gaming_leds(void) {
 
     rgb_matrix_set_collection_color(lit_keys, sizeof(lit_keys) / sizeof(uint8_t), RGB_RED);
     rgb_matrix_set_collection_color(unlit_keys, sizeof(unlit_keys) / sizeof(uint8_t), 0, 0, 0);
+    show_arrow_leds(RGB_RED);
 }
 
 void show_layer_indicator(int layer) {
@@ -207,38 +222,46 @@ void show_win_special_leds(void) {
     rgb_matrix_set_color(16, RGB_RED);  // Q Key Shutdown
     rgb_matrix_set_color(17, RGB_YELLOW);  // W Key - Sleep
     show_win_media_control_leds();
+    show_arrow_leds(RGB_WHITE);
 }
 
 void show_kb_config_keys(void) {
     key_leds_off(false);
 
-    //RGB CYCLE
-    rgb_matrix_set_color(31, RGB_BLUE);   // cycle left
-    rgb_matrix_set_color(33, RGB_BLUE);   // cycle right
+    // HUE
+    rgb_matrix_set_color(16, RGB_BLUE);             // hue up
+    rgb_matrix_set_color(31, RGB_ORANGE);           // hue down
 
-    //RGB VALUE
-    rgb_matrix_set_color(17, RGB_WHITE);        // value up
-    rgb_matrix_set_color(32, 0x5A,0x5A,0x5A);   // value down
+    // SAT
+    rgb_matrix_set_color(17, RGB_RED);              // sat up
+    rgb_matrix_set_color(32, 0xFF, 0x9B, 0x9B);     // sat down
 
-    //RGB HUE
-    rgb_matrix_set_color(19, RGB_MAGENTA);      // hue up
-    rgb_matrix_set_color(34, RGB_TEAL);         // hue down
+    // WORK MODE - Sets keys white and toggles a boolean so we know the current state
+    rgb_matrix_set_color(46, RGB_WHITE);
 
-    //RGB SAT
-    rgb_matrix_set_color(20, RGB_RED);          // sat up
-    rgb_matrix_set_color(35, RGB_WHITE);        // sat down
+    // VALUE
+    rgb_matrix_set_color(18, RGB_MAGENTA);          // value up
+    rgb_matrix_set_color(33, 0x32,0x00,0x32);       // value down
+    rgb_matrix_set_color(47, 0x32,0x32,0x32);       // RGB Toggle
+
+    //RGB MODE
+    rgb_matrix_set_color(19, RGB_TEAL);             // cycle left
+    rgb_matrix_set_color(34, RGB_TEAL);             // cycle right
 
     //RGB SPEED
-    rgb_matrix_set_color(16, RGB_YELLOW);        // slower
-    rgb_matrix_set_color(18, RGB_YELLOW);        // faster
+    rgb_matrix_set_color(20, RGB_YELLOW);           // slower
+    rgb_matrix_set_color(35, RGB_YELLOW);           // faster
 
     // Light KL, as they're the exit keys for this layer
     rgb_matrix_set_color(38, 0x5A,0x5A,0x5A);
     rgb_matrix_set_color(39, 0x5A,0x5A,0x5A);
 }
 
-// Runs constantly in the background, in a loop.
-void matrix_scan_user(void) {
+void show_custom_lighting(void) {
+    if(work_mode) {
+        rgb_matrix_set_color_all(RGB_WHITE);
+    }
+
     // Find the current layer
     uint8_t layer = biton32(layer_state);
 
@@ -273,7 +296,10 @@ void matrix_scan_user(void) {
     }
 
     show_layer_indicator(layer);
+}
 
+// Runs constantly in the background, in a loop.
+void matrix_scan_user(void) {
     // Handle Leader Key Behaviour
     LEADER_DICTIONARY() {
         leading = false;
@@ -373,6 +399,11 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 }
             }
             return false;
+        case RGB_WRK:
+            if(record->event.pressed) {
+                toggle_work_mode();
+            }
+            return false;
         case KC_RALT:
             r_alt_down = record->event.pressed;
             return true;
@@ -385,10 +416,11 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 
 void rgb_matrix_indicators_user(void)
 {
+    show_custom_lighting();
+
 	uint8_t this_led = host_keyboard_leds();
 
     if (this_led & (1 << USB_LED_CAPS_LOCK)) {
-
         rgb_matrix_set_collection_color(base_leds_left, sizeof(base_leds_left) / sizeof(uint8_t), RGB_RED);
     }
 }
