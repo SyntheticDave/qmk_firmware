@@ -13,6 +13,7 @@ enum alt_keycodes {
     DBG_MOU,                // DEBUG Toggle Mouse Prints
     MD_BOOT,                // Restart into bootloader after hold timeout
     RGB_WRK,                // Set RGB to white (for work)
+    TYP_EXT                 // Type exit and press enter
 };
 
 uint8_t all_leds[] = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101};
@@ -55,7 +56,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     ),
     [MAC_SPECIAL] = LAYOUT_65_ansi_blocker(
         KC_GRV ,  KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,  _______, KC_MUTE, \
-        _______, _______, _______, _______, _______, _______, _______, U_T_AUTO,U_T_AGCR, _______, CG_LEFT, AS_LBRC, AS_RBRC, CG_RGHT, KC_END,  \
+        _______, _______, _______, TYP_EXT, _______, _______, _______, U_T_AUTO,U_T_AGCR, _______, CG_LEFT, AS_LBRC, AS_RBRC, CG_RGHT, KC_END,  \
         KC_CAPS, _______, _______, _______, _______, _______, _______, _______, _______,  _______, HYPR_KS, HYPR_KP,          SA_QUOT, KC_VOLU, \
         _______, _______, _______, _______, _______, _______, _______, _______, HYPR_LB, HYPR_RB , HYPR_KI, _______,          KC_PGUP, KC_VOLD, \
         _______, _______, _______,                            _______,                             _______, _______, KC_HOME, KC_PGDN, KC_END   \
@@ -172,6 +173,9 @@ void show_mac_special_leds(void) {
     show_mac_gpm_leds();
     show_mac_vs_code_leds();
     show_arrow_leds(RGB_WHITE);
+
+    // Exit key
+    rgb_matrix_set_color(18, RGB_RED);
 }
 
 void show_mac_meta_leds(void) {
@@ -409,6 +413,11 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             return true;
         case KC_LCMD:
           meta_down = record->event.pressed;
+            return true;
+        case TYP_EXT:
+          if (record->event.pressed) {
+            SEND_STRING("exit\n");
+          }
         default:
             return true;  // Process all other keycodes normally
     }
