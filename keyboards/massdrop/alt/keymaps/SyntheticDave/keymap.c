@@ -36,6 +36,7 @@ uint8_t arrow_keys[] = {56,64,65,66};
 #define HYPR_LB HYPR(KC_LBRC)   // GPM Track Back
 #define HYPR_RB HYPR(KC_RBRC)   // GPM Track Forward
 #define SA_QUOT S(A(KC_QUOT))   // Alt + Shift + ' - VS Code Terminal Focus
+#define G_BSPC G(KC_BSPC)       // Meta + Backspace
 #define WIN_S MO(WIN_SPECIAL)
 #define MAC_S MO(MAC_SPECIAL)
 
@@ -55,7 +56,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         _______, _______, _______,                            _______,                            _______, MAC_S  , _______, _______, _______  \
     ),
     [MAC_SPECIAL] = LAYOUT_65_ansi_blocker(
-        KC_GRV ,  KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,  _______, KC_MUTE, \
+        KC_GRV ,  KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,  G_BSPC, KC_MUTE, \
         _______, _______, _______, TYP_EXT, _______, _______, _______, U_T_AUTO,U_T_AGCR, _______, CG_LEFT, AS_LBRC, AS_RBRC, CG_RGHT, KC_END,  \
         KC_CAPS, _______, _______, _______, _______, _______, _______, _______, _______,  _______, HYPR_KS, HYPR_KP,          SA_QUOT, KC_VOLU, \
         _______, _______, _______, _______, _______, _______, _______, _______, HYPR_LB, HYPR_RB , HYPR_KI, _______,          KC_PGUP, KC_VOLD, \
@@ -176,6 +177,9 @@ void show_mac_special_leds(void) {
 
     // Exit key
     rgb_matrix_set_color(18, RGB_RED);
+
+    // Backspace (sends CMD+Backspace, often used for deletion)
+    rgb_matrix_set_color(13, RGB_RED);
 }
 
 void show_mac_meta_leds(void) {
@@ -324,7 +328,6 @@ void matrix_scan_user(void) {
         SEQ_TWO_KEYS(KC_K, KC_L) {
             layer_invert(KB_CONFIG);  // Toggle the lighting config layer
         }
-
         leader_end();
     }
 };
