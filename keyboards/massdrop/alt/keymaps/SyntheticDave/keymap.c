@@ -2,7 +2,7 @@
 
 #include <print.h>
 
-enum layers { DEFAULT = 0, MAC, MAC_SPECIAL, WIN, WIN_GAMING, WIN_SPECIAL, KB_CONFIG };
+enum layers { DEFAULT = 0, MAC, MAC_SPECIAL, WIN, WIN_GAMING, WIN_SPECIAL, KB_CONFIG, KB_RGB_PRV };
 
 enum alt_keycodes {
     U_T_AUTO = SAFE_RANGE,  // USB Extra Port Toggle Auto Detect / Always Active
@@ -13,7 +13,7 @@ enum alt_keycodes {
     DBG_MOU,                // DEBUG Toggle Mouse Prints
     MD_BOOT,                // Restart into bootloader after hold timeout
     RGB_WRK,                // Set RGB to white (for work)
-    TYP_EXT                 // Type exit and press enter
+    TYP_EXT,                // Type exit and press enter
 };
 
 uint8_t all_leds[] = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101};
@@ -39,6 +39,7 @@ uint8_t arrow_keys[] = {56,64,65,66};
 #define G_BSPC G(KC_BSPC)       // Meta + Backspace
 #define WIN_S MO(WIN_SPECIAL)
 #define MAC_S MO(MAC_SPECIAL)
+#define RGB_PRV TG(KB_RGB_PRV)  // Preview RGB lighting while in config layer
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [DEFAULT] = LAYOUT_65_ansi_blocker(
@@ -85,12 +86,18 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     ),
     [KB_CONFIG] = LAYOUT_65_ansi_blocker(
         _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, \
-        _______, RGB_HUI, RGB_SAI, RGB_VAI, RGB_MOD, RGB_SPI, _______, _______, _______, _______, _______, _______, _______, _______, _______, \
+        _______, RGB_HUI, RGB_SAI, RGB_VAI, RGB_MOD, RGB_SPI, _______, _______, _______, _______, RGB_PRV, _______, _______, _______, _______, \
         _______, RGB_HUD, RGB_SAD, RGB_VAD,RGB_RMOD, RGB_SPD, _______, _______, _______, _______, _______, _______,          _______, _______, \
         _______, _______, RGB_WRK, RGB_TOG, _______, MD_BOOT, NK_TOGG, DBG_TOG, _______, _______, _______, _______,          _______, _______, \
         _______, _______, _______,                            _______,                            _______, _______, _______, _______, _______  \
     ),
-
+    [KB_RGB_PRV] = LAYOUT_65_ansi_blocker(
+        XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
+        XXXXXXX, RGB_HUI, RGB_SAI, RGB_VAI, RGB_MOD, RGB_SPI, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, _______, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
+        XXXXXXX, RGB_HUD, RGB_SAD, RGB_VAD,RGB_RMOD, RGB_SPD, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,          XXXXXXX, XXXXXXX, \
+        XXXXXXX, XXXXXXX, RGB_WRK, RGB_TOG, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,          XXXXXXX, XXXXXXX, \
+        XXXXXXX, XXXXXXX, XXXXXXX,                            XXXXXXX,                            XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX  \
+    ),
     /*
     [X] = LAYOUT(
         _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, \
