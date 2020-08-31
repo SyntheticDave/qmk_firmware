@@ -14,7 +14,7 @@ CUSTOM_MATRIX = yes
 BOOTMAGIC_ENABLE = no       # Virtual DIP switch configuration
 MOUSEKEY_ENABLE = no        # Mouse keys
 EXTRAKEY_ENABLE = yes       # Audio control and System control
-CONSOLE_ENABLE = no         # Console for debug
+CONSOLE_ENABLE = yes         # Console for debug
 COMMAND_ENABLE = no         # Commands for debug and configuration
 # Do not enable SLEEP_LED_ENABLE. it uses the same timer as BACKLIGHT_ENABLE
 SLEEP_LED_ENABLE = no       # Breathing sleep LED during USB suspend
@@ -31,7 +31,7 @@ HD44780_ENABLE = no         # Enable support for HD44780 based LCDs
 VIRTSER_ENABLE = no         # USB Serial Driver
 RAW_ENABLE = no             # Raw device
 AUTO_SHIFT_ENABLE = no      # Auto Shift
-LEADER_ENABLE = yes					# Leader key
+LEADER_ENABLE = yes			# Leader key
 # Custom RGB matrix handling
 RGB_MATRIX_ENABLE = custom
 

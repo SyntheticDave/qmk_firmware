@@ -2,7 +2,7 @@
 
 #include <print.h>
 
-enum layers { DEFAULT = 0, MAC, MAC_SPECIAL, WIN, WIN_GAMING, WIN_SPECIAL, KB_CONFIG, KB_RGB_PRV };
+enum layers { DEFAULT = 0, MAC, MAC_SPECIAL, MAC_ONE_SHOTS, WIN, WIN_GAMING, WIN_SPECIAL, SNAKE, KB_CONFIG, KB_RGB_PRV };
 
 enum alt_keycodes {
     U_T_AUTO = SAFE_RANGE,  // USB Extra Port Toggle Auto Detect / Always Active
@@ -14,8 +14,11 @@ enum alt_keycodes {
     MD_BOOT,                // Restart into bootloader after hold timeout
     RGB_WRK,                // Set RGB to white (for work)
     TYP_EXT,                // Type exit and press enter
+    TYP_EXB,                // Type exit! and press enter
+    MS_ENT,                 // MAC special layer enter
 };
 
+// LED Sets
 uint8_t all_leds[] = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101};
 uint8_t key_leds[] = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66};
 uint8_t key_leds_no_top_row[] = {15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66};
@@ -26,20 +29,59 @@ uint8_t base_leds_back[] = {86,87,88,89,90,91,92,93,94,95,96,97,98,99,100};
 uint8_t base_leds_left[] = {101,102,103,104};
 uint8_t arrow_keys[] = {56,64,65,66};
 
+// VS Code Shortcuts
 #define CG_LEFT C(G(KC_LEFT))   // Ctrl + Meta + Left Arrow - Move Code Panel Left
-#define CG_RGHT C(G(KC_RIGHT))   // Ctrl + Meta + Right Arrow - Move Code Panel Right
+#define CG_RGHT C(G(KC_RIGHT))  // Ctrl + Meta + Right Arrow - Move Code Panel Right
 #define AS_LBRC A(S(KC_LBRC))   // Alt + Shift + [ - Move to Left Panel
 #define AS_RBRC A(S(KC_RBRC))   // Alt + Shift + ] - Move to Right Panel
-#define HYPR_KS HYPR(KC_S)      // GPM Focus
-#define HYPR_KP HYPR(KC_P)      // GPM Track Play/Pause
-#define HYPR_KI HYPR(KC_I)      // GPM Track Info
-#define HYPR_LB HYPR(KC_LBRC)   // GPM Track Back
-#define HYPR_RB HYPR(KC_RBRC)   // GPM Track Forward
 #define SA_QUOT S(A(KC_QUOT))   // Alt + Shift + ' - VS Code Terminal Focus
+#define VS_FLIP HYPR(KC_SCOLON) // Rails - FlipFlop
+
+// CMD + ... shortcuts - Making up for the lack of a right CMD key
 #define G_BSPC G(KC_BSPC)       // Meta + Backspace
+#define G_ENTR G(KC_ENT)        // Meta + Enter
+
+// Keyboard Layer Control
 #define WIN_S MO(WIN_SPECIAL)
 #define MAC_S MO(MAC_SPECIAL)
+#define MAC_OSL OSL(MAC_ONE_SHOTS)
+
+// Keyboard toggles
+#define SNK_TOG TG(SNAKE)       // Toggle snake case layer (space sends underscore)
 #define RGB_PRV TG(KB_RGB_PRV)  // Preview RGB lighting while in config layer
+
+// App Focus Shortcuts
+// iTerm
+#define TERM_D MEH(KC_T)  // Open dedicated terminal window
+#define TERM_S HYPR(KC_T) // Show/Hide all terminal windows
+#define MAC_FN KC_F20 // Karabiner listens for F20 and turns it into an apple keyboard fn
+#define TRELLO HYPR(KC_F13)
+#define FINDER HYPR(KC_F14)
+#define VS_CODE HYPR(KC_F15)
+#define SLACK HYPR(KC_F16)
+
+
+// Music Control - Alfred Spotify Mini Player
+#define SPOT_MP MEH(KC_S)       // Show Mini Player Control
+#define SPOT_QU MEH(KC_DOT)     // Play Queue
+#define SPOT_CT MEH(KC_SLASH)   // Current Track
+#define SPOT_PPL MEH(KC_P)      // Private Playlists
+#define SPOT_ATP MEH(KC_EQL)    // Add Current Track to Playlist
+#define SPOT_RFP MEH(KC_MINS)   // Remove Current Track from Playlist
+#define SPOT_PPS MEH(KC_ENT)    // Play/Pause
+#define SPOT_NTK HYPR(KC_RBRC)   // Next Track
+#define SPOT_LTK HYPR(KC_LBRC)   // Previous Track
+
+//  Workflow Triggers
+//      Code
+#define S3_OP MEH(KC_3)     // S3 Bucket
+#define NEP_MOD MEH(KC_M)   // Rails Model
+#define NEP_AAT MEH(KC_A)   // Rails Model Attribute
+//      House Lights
+#define DST_OFF LCAG(KC_LEFT)       // Dave Study Lights Off
+#define DST_WRK LCAG(KC_UP)         // Dave Study Lights Work/Concentrate
+#define DST_STD LCAG(KC_RIGHT)      // Dave Study Reading Lights
+#define DST_RLX LCAG(KC_DOWN)       // Dave Study Lights Relax
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [DEFAULT] = LAYOUT_65_ansi_blocker(
@@ -57,11 +99,18 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         _______, _______, _______,                            _______,                            _______, MAC_S  , _______, _______, _______  \
     ),
     [MAC_SPECIAL] = LAYOUT_65_ansi_blocker(
-        KC_GRV ,  KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,  G_BSPC, KC_MUTE, \
-        _______, _______, _______, TYP_EXT, _______, _______, _______, U_T_AUTO,U_T_AGCR, _______, CG_LEFT, AS_LBRC, AS_RBRC, CG_RGHT, KC_END,  \
-        KC_CAPS, _______, _______, _______, _______, _______, _______, _______, _______,  _______, HYPR_KS, HYPR_KP,          SA_QUOT, KC_VOLU, \
-        _______, _______, _______, _______, _______, _______, _______, _______, HYPR_LB, HYPR_RB , HYPR_KI, _______,          KC_PGUP, KC_VOLD, \
-        _______, _______, _______,                            _______,                             _______, _______, KC_HOME, KC_PGDN, KC_END   \
+        KC_GRV ,  KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,  G_BSPC, TRELLO, \
+        _______, _______, TYP_EXB, TYP_EXT, _______, TERM_S ,  TERM_D, _______, _______, _______, CG_LEFT, AS_LBRC, AS_RBRC, CG_RGHT, FINDER , \
+        KC_CAPS, NEP_AAT,  S3_OP , _______, _______, _______, _______, _______, _______, _______, VS_FLIP, SA_QUOT,           MS_ENT, VS_CODE, \
+        SNK_TOG, _______, _______, _______, _______, _______, _______, SPOT_MP, _______, _______ ,_______, _______,          KC_PGUP, SLACK  , \
+        _______, _______, _______,                            MAC_OSL,                             MAC_FN, _______, KC_HOME, KC_PGDN, KC_END   \
+    ),
+    [MAC_ONE_SHOTS] = LAYOUT_65_ansi_blocker(
+        KC_ESC , _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,SPOT_RFP,SPOT_ATP, _______, _______, \
+        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,SPOT_PPL, _______, _______, _______, _______, \
+        KC_LEAD, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          KC_MPLY, _______, \
+        _______, _______, _______, _______, _______, _______, _______, _______, _______, SPOT_QU, SPOT_CT, _______,          _______, _______, \
+        _______, _______, _______,                            _______,                            _______, _______, KC_MPRV, _______, KC_MNXT  \
     ),
     [WIN] = LAYOUT_65_ansi_blocker(
         _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, \
@@ -75,7 +124,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, \
         _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          _______, _______, \
         _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          _______, _______, \
-        _______, _______, KC_NO,                            _______,                              _______,  WIN_S , _______, _______, _______  \
+        _______, _______, KC_NO,                              _______,                            _______,  WIN_S , _______, _______, _______  \
     ),
     [WIN_SPECIAL] = LAYOUT_65_ansi_blocker(
         KC_GRV,  KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,  _______, _______, \
@@ -84,12 +133,19 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         _______, _______, _______, _______, _______, _______, _______, _______, KC_MPRV, KC_MNXT, _______, _______,          KC_PGUP, _______, \
         _______, _______, _______,                            _______,                            _______, _______, KC_HOME, KC_PGDN, KC_END   \
     ),
-    [KB_CONFIG] = LAYOUT_65_ansi_blocker(
+    [SNAKE] = LAYOUT_65_ansi_blocker(
         _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, \
-        _______, RGB_HUI, RGB_SAI, RGB_VAI, RGB_MOD, RGB_SPI, _______, _______, _______, _______, RGB_PRV, _______, _______, _______, _______, \
-        _______, RGB_HUD, RGB_SAD, RGB_VAD,RGB_RMOD, RGB_SPD, _______, _______, _______, _______, _______, _______,          _______, _______, \
-        _______, _______, RGB_WRK, RGB_TOG, _______, MD_BOOT, NK_TOGG, DBG_TOG, _______, _______, _______, _______,          _______, _______, \
-        _______, _______, _______,                            _______,                            _______, _______, _______, _______, _______  \
+        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, \
+        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          _______, _______, \
+        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          _______, _______, \
+        _______, _______, _______,                            KC_UNDS,                            _______, _______, _______, _______, _______  \
+    ),
+    [KB_CONFIG] = LAYOUT_65_ansi_blocker(
+        XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
+        XXXXXXX, RGB_HUI, RGB_SAI, RGB_VAI, RGB_MOD, RGB_SPI, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, RGB_PRV, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
+        _______, RGB_HUD, RGB_SAD, RGB_VAD,RGB_RMOD, RGB_SPD, XXXXXXX, XXXXXXX, _______, _______, XXXXXXX, XXXXXXX,          XXXXXXX, XXXXXXX, \
+        XXXXXXX, XXXXXXX, RGB_WRK, RGB_TOG, XXXXXXX, MD_BOOT, NK_TOGG, DBG_TOG, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,          DST_WRK, XXXXXXX, \
+        XXXXXXX, XXXXXXX, XXXXXXX,                            XXXXXXX,                            _______, _______, DST_OFF, DST_RLX, DST_STD  \
     ),
     [KB_RGB_PRV] = LAYOUT_65_ansi_blocker(
         XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
@@ -136,10 +192,21 @@ void matrix_init_user(void) { print("keyboard starting\n"); };
 bool r_alt_down = false;
 bool meta_down = false;
 bool work_mode = false;
+bool mac_fn_down = false;
 
 // HACK: Can't figure out how to determine current hue/saturation, so using this workaround
 void toggle_work_mode(void) {
     work_mode = !work_mode;
+
+    // FIXME: Changed shortcuts
+    if(work_mode) {
+        // DST_WRK LCAG(KC_UP)
+        // SS_HYPR doesn't work?
+        SEND_STRING(SS_LCTL(SS_LSFT(SS_LGUI(SS_LALT("1")))));
+    } else {
+        SEND_STRING(SS_LCTL(SS_LSFT(SS_LGUI(SS_LALT("2")))));
+        // DST_RLX LCAG(KC_DOWN)
+    }
 }
 
 // Sets a list of keys to the same color
@@ -162,12 +229,17 @@ void show_mac_base_leds(void) {
 }
 
 void show_mac_gpm_leds(void) {
-    uint8_t lit_keys[]   = {54, 53, 52, 41, 40};
+    uint8_t lit_keys[]   = {45, 54, 56, 61, 64, 65, 66};
     rgb_matrix_set_collection_color(lit_keys, sizeof(lit_keys) / sizeof(uint8_t), RGB_GPM_ORANGE);
 }
 
+void show_mac_spotify_leds(void) {
+    uint8_t lit_keys[]   = {11, 12, 25, 42, 53, 54, 64, 66};
+    rgb_matrix_set_collection_color(lit_keys, sizeof(lit_keys) / sizeof(uint8_t), RGB_GREEN);
+}
+
 void show_mac_vs_code_leds(void) {
-    uint8_t lit_keys[] = {25, 26, 27, 28, 42};
+    uint8_t lit_keys[] = {25, 26, 27, 28, 40, 41};
     rgb_matrix_set_collection_color(lit_keys, sizeof(lit_keys) / sizeof(uint8_t), RGB_BLUE);
 }
 
@@ -176,22 +248,67 @@ void show_arrow_leds(uint8_t red, uint8_t green, uint8_t blue) {
     rgb_matrix_set_collection_color(lit_keys, sizeof(lit_keys) / sizeof(uint8_t), red, green, blue);
 }
 
+void show_snake_leds(void) {
+    rgb_matrix_set_color(61, RGB_TURQUOISE);  // Space Key
+}
+
 void show_mac_special_leds(void) {
     key_leds_off(true);
-    show_mac_gpm_leds();
     show_mac_vs_code_leds();
     show_arrow_leds(RGB_WHITE);
 
-    // Exit key
-    rgb_matrix_set_color(18, RGB_RED);
+    // Exit keys
+    rgb_matrix_set_color(18, RGB_ORANGE);
+    rgb_matrix_set_color(17, RGB_RED);
 
     // Backspace (sends CMD+Backspace, often used for deletion)
     rgb_matrix_set_color(13, RGB_RED);
+
+    // Enter (sends CMD+Enter)
+    rgb_matrix_set_color(42, RGB_WHITE);
+
+    // RAlt - Sends F20 - Karabiner catches this and turns it into Mac OS fn key
+    rgb_matrix_set_color(62, RGB_WHITE);
+
+    // Capslock
+    rgb_matrix_set_color(30, RGB_YELLOW);
+
+    // Snake Case lock - l-shift
+    rgb_matrix_set_color(44, RGB_YELLOW);
+
+    // One shot layer trigger space
+    rgb_matrix_set_color(61, RGB_GREEN);
+
+    // Spotify Mini Player
+    rgb_matrix_set_color(51, RGB_GREEN);
+
+    // Neptune workflow triggers
+    uint8_t trigger_keys[]   = {31, 32};
+    rgb_matrix_set_collection_color(trigger_keys, sizeof(trigger_keys) / sizeof(uint8_t), RGB_BLUE);
+
+    // iTerm Shortcuts
+    uint8_t iterm_keys[]   = {20, 21};
+    rgb_matrix_set_collection_color(iterm_keys, sizeof(iterm_keys) / sizeof(uint8_t), RGB_GOLD);
+
+    // Show Trello
+    rgb_matrix_set_color(14, RGB_BLUE);
+    // Show Finder
+    rgb_matrix_set_color(29, RGB_TEAL);
+    // Show VS Code
+    rgb_matrix_set_color(43, RGB_PURPLE);
+    // Show Slack
+    rgb_matrix_set_color(57, RGB_MAGENTA);
 }
 
 void show_mac_meta_leds(void) {
     rgb_matrix_set_color(16, RGB_RED);  // Q Key
     rgb_matrix_set_color(17, RGB_YELLOW);  // W Key
+}
+
+void show_mac_one_shot_leds(void) {
+  key_leds_off(false);
+//   show_mac_gpm_leds();
+    show_mac_spotify_leds();
 }
 
 void show_mac_window_snap_keys(void) {
@@ -238,6 +355,8 @@ void show_win_special_leds(void) {
     rgb_matrix_set_color(17, RGB_YELLOW);  // W Key - Sleep
     show_win_media_control_leds();
     show_arrow_leds(RGB_WHITE);
+    // Capslock
+    rgb_matrix_set_color(30, RGB_YELLOW);
 }
 
 void show_kb_config_keys(void) {
@@ -270,6 +389,10 @@ void show_kb_config_keys(void) {
     // Light KL, as they're the exit keys for this layer
     rgb_matrix_set_color(38, 0x5A,0x5A,0x5A);
     rgb_matrix_set_color(39, 0x5A,0x5A,0x5A);
+
+    // Dave Study Lighting
+    uint8_t study_keys[] = {56,64,65,66};
+    rgb_matrix_set_collection_color(study_keys, sizeof(study_keys) / sizeof(uint8_t), RGB_GOLD);
 }
 
 void show_custom_lighting(void) {
@@ -281,7 +404,11 @@ void show_custom_lighting(void) {
     uint8_t layer = biton32(layer_state);
 
     // Set lighting based on the current layer
+    // TODO: Fix snake case lighting - Completely breaks other lighting atm, as it's the last active layer. Could consider using a modifier, rather than an entire layer to implement this. Would be much easier on the lighting side, at least
     switch (layer) {
+        case MAC_ONE_SHOTS:
+          show_mac_one_shot_leds();
+          break;
         case MAC_SPECIAL:
             show_mac_special_leds();
         case MAC:
@@ -325,6 +452,12 @@ void matrix_scan_user(void) {
         SEQ_ONE_KEY(KC_M) {
             layer_move(MAC);  // Activate Mac OS Layer (only)
         }
+        // Double tap leader key
+        SEQ_ONE_KEY(KC_LEAD) {
+          // TODO: Only activate mac oneshot layer if we're on the mac base layer or the osl
+          // layer_state_is(MAC)
+          layer_invert(MAC_ONE_SHOTS);
+        }
         SEQ_ONE_KEY(KC_W) {
             layer_move(WIN);  // Activate Windows Layer (only)
         }
@@ -333,7 +466,7 @@ void matrix_scan_user(void) {
             layer_on(WIN_GAMING);  // Then activate the gaming layer
         }
         SEQ_TWO_KEYS(KC_K, KC_L) {
-            layer_invert(KB_CONFIG);  // Toggle the lighting config layer
+            layer_invert(KB_CONFIG);  // Toggle the keyboard config layer
         }
         leader_end();
     }
@@ -421,13 +554,35 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         case KC_RALT:
             r_alt_down = record->event.pressed;
             return true;
+        case MAC_FN:
+            mac_fn_down = record->event.pressed;
+            return true;
+        case MS_ENT:
+            // Mac Special layer enter handling
+            if(record->event.pressed) {
+                if(mac_fn_down) {
+                    SEND_STRING(SS_TAP(X_ENT));
+                    return false;
+                }
+                // Send CMD + Enter if ralt not being held
+                SEND_STRING(SS_DOWN(X_RGUI));
+                SEND_STRING(SS_TAP(X_ENT));
+                SEND_STRING(SS_UP(X_RGUI));
+                return false;
+            }
         case KC_LCMD:
-          meta_down = record->event.pressed;
+            meta_down = record->event.pressed;
             return true;
         case TYP_EXT:
-          if (record->event.pressed) {
-            SEND_STRING("exit\n");
-          }
+            if (record->event.pressed) {
+                SEND_STRING("exit\n");
+            }
+            return false;
+        case TYP_EXB:
+            if (record->event.pressed) {
+                SEND_STRING("exit!\n");
+            }
+            return false;
         default:
             return true;  // Process all other keycodes normally
     }
