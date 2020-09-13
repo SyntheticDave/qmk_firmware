@@ -137,4 +137,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define LEADER_PER_KEY_TIMING
 #define LEADER_TIMEOUT 250
 
+// Tap Dance Options
+#define TAPPING_TERM 150
+
 #include "config_led.h"

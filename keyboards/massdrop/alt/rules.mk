@@ -32,6 +32,7 @@ VIRTSER_ENABLE = no         # USB Serial Driver
 RAW_ENABLE = no             # Raw device
 AUTO_SHIFT_ENABLE = no      # Auto Shift
 LEADER_ENABLE = yes			# Leader key
+TAP_DANCE_ENABLE = yes
 # Custom RGB matrix handling
 RGB_MATRIX_ENABLE = custom
 
