@@ -44,6 +44,10 @@ uint8_t arrow_keys[] = {56,64,65,66};
 #define G_BSPC G(KC_BSPC)       // Meta + Backspace
 #define G_ENTR G(KC_ENT)        // Meta + Enter
 
+// Misc Keys
+#define HPR_RGT HYPR(KC_RGHT)
+#define HPR_LFT HYPR(KC_LEFT)
+
 // Keyboard Layer Control
 #define WIN_S MO(WIN_SPECIAL)
 #define MAC_S MO(MAC_SPECIAL)
@@ -54,16 +58,17 @@ uint8_t arrow_keys[] = {56,64,65,66};
 #define RGB_PRV TG(KB_RGB_PRV)  // Preview RGB lighting while in config layer
 
 // App Focus Shortcuts
-// iTerm
 #define TERM_D MEH(KC_T)  // Open dedicated terminal window
 #define TERM_S HYPR(KC_T) // Show/Hide all terminal windows
 #define MAC_FN KC_F20 // Karabiner listens for F20 and turns it into an apple keyboard fn
 #define TRELLO HYPR(KC_F13)
 #define FINDER HYPR(KC_F14)
 #define VS_CODE HYPR(KC_F15)
+#define FORK MEH(KC_F15)
 #define SLACK HYPR(KC_F16)
 #define BROWSER HYPR(KC_F18)
 #define MUSIC   HYPR(KC_M) // Show the music Player
+#define EMAIL HYPR(KC_F19)
 
 // Music Control - Alfred Spotify Mini Player
 #define SPOT_MP MEH(KC_S)       // Show Mini Player Control
@@ -104,29 +109,46 @@ enum {
   DOUBLE_HOLD = 4,
   DOUBLE_SINGLE_TAP = 5, //send two single taps
   TRIPLE_TAP = 6,
-  TRIPLE_HOLD = 7
+  TRIPLE_HOLD = 7,
+  HOLD = 8
 };
 
 //Tap dance enums
 enum {
     T_HME,
     T_KCM,
-    T_SLS
+    T_SLS,
+    T_PDN,
+    T_PUP,
+    T_LSH,
+    T_RSH,
+    T_LCL,
+    T_FNC,
 };
 
 #define TD_HME TD(T_HME)
 #define TD_KCM TD(T_KCM)
 #define TD_SLS TD(T_SLS)
+#define TD_PDN TD(T_PDN)
+#define TD_PUP TD(T_PUP)
+#define TD_LSH TD(T_LSH)
+#define TD_RSH TD(T_RSH)
+#define TD_LCL TD(T_LCL)
 
 int cur_dance (qk_tap_dance_state_t *state);
 
+void tap_dance_reset (qk_tap_dance_state_t *state, void *user_data);
 void home_finished (qk_tap_dance_state_t *state, void *user_data);
-void home_reset (qk_tap_dance_state_t *state, void *user_data);
 void m_finished (qk_tap_dance_state_t *state, void *user_data);
-void m_reset (qk_tap_dance_state_t *state, void *user_data);
 void slash_finished (qk_tap_dance_state_t *state, void *user_data);
-void slash_reset (qk_tap_dance_state_t *state, void *user_data);
-
+void pg_down_finished (qk_tap_dance_state_t *state, void *user_data);
+void pg_up_finished (qk_tap_dance_state_t *state, void *user_data);
+void lshft_finished (qk_tap_dance_state_t *state, void *user_data);
+void lshft_reset (qk_tap_dance_state_t *state, void *user_data);
+void rshft_finished (qk_tap_dance_state_t *state, void *user_data);
+void rshft_reset (qk_tap_dance_state_t *state, void *user_data);
+void lctrl_finished (qk_tap_dance_state_t *state, void *user_data);
+void lctrl_reset (qk_tap_dance_state_t *state, void *user_data);
 
 // ==================
 // Key Map
@@ -137,8 +159,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_GESC, KC_1,    KC_2,    KC_3,    KC_4,    KC_5,    KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    KC_MINS, KC_EQL,  KC_BSPC, KC_DEL,  \
         KC_TAB,  KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,    KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    KC_LBRC, KC_RBRC, KC_BSLS, KC_HOME, \
         KC_LEAD, KC_A,    KC_S,    KC_D,    KC_F,    KC_G,    KC_H,    KC_J,    KC_K,    KC_L,    KC_SCLN, KC_QUOT,          KC_ENT,  KC_PGUP, \
-        KC_LSPO, KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,    KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH, KC_RSPC,          KC_UP,   KC_PGDN, \
-        KC_LCTL, KC_LALT, KC_LGUI,                            KC_SPC,                             KC_RALT, KC_RGUI, KC_LEFT, KC_DOWN, KC_RGHT  \
+        TD_LSH , KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,    KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH, TD_RSH ,          KC_UP,   KC_PGDN, \
+        TD_LCL , KC_LALT, KC_LGUI,                            KC_SPC,                             KC_RALT, KC_RGUI, KC_LEFT, KC_DOWN, KC_RGHT  \
     ),
     [MAC] = LAYOUT_65_ansi_blocker(
         _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, \
@@ -149,16 +171,16 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     ),
     [MAC_SPECIAL] = LAYOUT_65_ansi_blocker(
         KC_GRV ,  KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,  G_BSPC, TRELLO , \
-        _______, _______, TYP_EXB, TYP_EXT, _______, TERM_S ,  TERM_D, _______, _______, _______, CG_LEFT, AS_LBRC, AS_RBRC, CG_RGHT, TD_HME , \
-        KC_CAPS, NEP_AAT,  S3_OP , _______, _______, _______, _______, _______, _______, _______, VS_FLIP, SA_QUOT,           MS_ENT, VS_CODE, \
-        SNK_TOG, _______, _______, _______, _______, _______, _______, TD_KCM , _______, _______ ,TD_SLS , _______,          KC_PGUP, SLACK  , \
+        _______, _______, TYP_EXB, TYP_EXT, _______, _______, _______, _______, _______, _______, CG_LEFT, AS_LBRC, AS_RBRC, CG_RGHT, TD_HME , \
+        KC_CAPS, NEP_AAT,  S3_OP , _______, _______, _______, _______, _______, _______, _______, VS_FLIP, SA_QUOT,           MS_ENT, TD_PUP , \
+        SNK_TOG, _______, _______, _______, _______, _______, _______, TD_KCM , _______, _______ ,TD_SLS , _______,          KC_PGUP, TD_PDN , \
         _______, _______, _______,                            MAC_OSL,                             MAC_FN, _______, KC_HOME, KC_PGDN, KC_END   \
     ),
     [MAC_ONE_SHOTS] = LAYOUT_65_ansi_blocker(
         KC_ESC , _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,SPOT_RFP,SPOT_ATP, _______, _______, \
         _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,SPOT_PPL, _______, _______, _______, _______, \
-        KC_LEAD, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          KC_MPLY, _______, \
-        _______, _______, _______, _______, _______, _______, _______, _______, _______, SPOT_QU, SPOT_CT, _______,          _______, _______, \
+        KC_LEAD, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          KC_MPLY, HPR_RGT, \
+        _______, _______, _______, _______, _______, _______, _______, _______, _______, SPOT_QU, SPOT_CT, _______,          _______, HPR_LFT, \
         _______, _______, _______,                            _______,                            _______, _______, KC_MPRV, _______, KC_MNXT  \
     ),
     [WIN] = LAYOUT_65_ansi_blocker(
@@ -288,7 +310,7 @@ void show_mac_spotify_leds(void) {
 }
 
 void show_mac_vs_code_leds(void) {
-    uint8_t lit_keys[] = {25, 26, 27, 28, 40, 41};
+    uint8_t lit_keys[] = {25, 26, 27, 28, 40, 41, 54};
     rgb_matrix_set_collection_color(lit_keys, sizeof(lit_keys) / sizeof(uint8_t), RGB_BLUE);
 }
 
@@ -335,17 +357,13 @@ void show_mac_special_leds(void) {
     uint8_t trigger_keys[]   = {31, 32};
     rgb_matrix_set_collection_color(trigger_keys, sizeof(trigger_keys) / sizeof(uint8_t), RGB_BLUE);
 
-    // iTerm Shortcuts
-    uint8_t iterm_keys[]   = {20, 21};
-    rgb_matrix_set_collection_color(iterm_keys, sizeof(iterm_keys) / sizeof(uint8_t), RGB_GOLD);
-
-    // Show Trello
+    // Show Trello - Del
     rgb_matrix_set_color(14, RGB_BLUE);
-    // Show Finder
+    // Show Finder/Browser - Home
     rgb_matrix_set_color(29, RGB_TEAL);
-    // Show VS Code
+    // Show VS Code/Terminal/Fork - PgUp
     rgb_matrix_set_color(43, RGB_PURPLE);
-    // Show Slack
+    // Show Slack/Mail/Chat - PgDn
     rgb_matrix_set_color(57, RGB_MAGENTA);
 }
 
@@ -355,9 +373,12 @@ void show_mac_meta_leds(void) {
 }
 
 void show_mac_one_shot_leds(void) {
-  key_leds_off(false);
-//   show_mac_gpm_leds();
+    key_leds_off(false);
     show_mac_spotify_leds();
+
+    // Move Spaces
+    uint8_t trigger_keys[]   = {43, 57};
+    rgb_matrix_set_collection_color(trigger_keys, sizeof(trigger_keys) / sizeof(uint8_t), RGB_WHITE);
 }
 
 void show_mac_window_snap_keys(void) {
@@ -705,7 +726,25 @@ int cur_dance (qk_tap_dance_state_t *state) {
     if (state->interrupted || !state->pressed)  return TRIPLE_TAP;
     else return TRIPLE_HOLD;
   }
-  else return 8; //magic number. At some point this method will expand to work for more presses
+  else return 9; //magic number. At some point this method will expand to work for more presses
+}
+
+// Slightly modified behaviour for modifier keys
+// They're often considered 'interrupted', as we hold them, then press another key in quick succession.
+// In this case, we still want to consider them held
+int cur_modifier_dance (qk_tap_dance_state_t *state) {
+  if(state->pressed) {
+      return HOLD;
+  }
+  else if (state->count == 1) {
+    if (!state->pressed)  return SINGLE_TAP;
+    else return SINGLE_HOLD;
+  }
+  else if (state->count == 2) {
+    if (state->pressed) return DOUBLE_HOLD;
+    else return DOUBLE_TAP;
+  }
+  else return cur_dance(state);
 }
 
 //instanalize an instance of 'tap' for the 'x' tap dance.
@@ -714,27 +753,21 @@ static tap xtap_state = {
   .state = 0
 };
 
+void tap_dance_reset (qk_tap_dance_state_t *state, void *user_data) {
+  xtap_state.state = 0;
+}
+
 /*
  Fn + Home key control
 */
 void home_finished (qk_tap_dance_state_t *state, void *user_data) {
   xtap_state.state = cur_dance(state);
   switch (xtap_state.state) {
-    // SEND_STRING(SS_TAP(X_ENT));
-
     // Finder on single tap
     case SINGLE_TAP: SEND_STRING(SS_LCTL(SS_LSFT(SS_LGUI(SS_LALT(SS_TAP(X_F14)))))); break;
     // Browser on double tap
     case DOUBLE_TAP: SEND_STRING(SS_LCTL(SS_LSFT(SS_LGUI(SS_LALT(SS_TAP(X_F18)))))); break;
   }
-}
-
-void home_reset (qk_tap_dance_state_t *state, void *user_data) {
-  switch (xtap_state.state) {
-    case SINGLE_TAP: unregister_code(KC_F14); break;
-    case SINGLE_HOLD: unregister_code(KC_F18); break;
-  }
-  xtap_state.state = 0;
 }
 
 /*
@@ -750,14 +783,6 @@ void m_finished (qk_tap_dance_state_t *state, void *user_data) {
   }
 }
 
-void m_reset (qk_tap_dance_state_t *state, void *user_data) {
-  switch (xtap_state.state) {
-    case SINGLE_TAP: break;
-    case SINGLE_HOLD: break;
-  }
-  xtap_state.state = 0;
-}
-
 /*
  Fn + / key control
 */
@@ -771,16 +796,104 @@ void slash_finished (qk_tap_dance_state_t *state, void *user_data) {
   }
 }
 
-void slash_reset (qk_tap_dance_state_t *state, void *user_data) {
+/*
+ Fn + Pg Down key control
+*/
+void pg_down_finished (qk_tap_dance_state_t *state, void *user_data) {
+  xtap_state.state = cur_dance(state);
   switch (xtap_state.state) {
-    case SINGLE_TAP: break;
-    case SINGLE_HOLD: break;
+    // VS Code Go to definition
+    // Show Slack
+    case SINGLE_TAP: SEND_STRING(SS_LCTL(SS_LSFT(SS_LGUI(SS_LALT(SS_TAP(X_F16)))))); break;
+    // Show Email
+    case DOUBLE_TAP: SEND_STRING(SS_LCTL(SS_LSFT(SS_LGUI(SS_LALT(SS_TAP(X_F19)))))); break;
+    // Chat
+    case TRIPLE_TAP: SEND_STRING(SS_LCTL(SS_LSFT(SS_LALT(SS_TAP(X_F19))))); break;
   }
+}
+
+/*
+ Fn + Pg Up key control
+*/
+void pg_up_finished (qk_tap_dance_state_t *state, void *user_data) {
+  xtap_state.state = cur_dance(state);
+  switch (xtap_state.state) {
+    // Show VS Code
+    case SINGLE_TAP: SEND_STRING(SS_LCTL(SS_LSFT(SS_LGUI(SS_LALT(SS_TAP(X_F15)))))); break;
+    // Show terminal
+    case DOUBLE_TAP: SEND_STRING(SS_LCTL(SS_LSFT(SS_LGUI(SS_LALT(SS_TAP(X_T)))))); break;
+    // Show global terminal
+    case DOUBLE_HOLD: SEND_STRING(SS_LCTL(SS_LSFT(SS_LALT(SS_TAP(X_T))))); break;
+    // Show Fork
+    case TRIPLE_TAP: SEND_STRING(SS_LCTL(SS_LSFT(SS_LGUI(SS_TAP(X_F15))))); break;
+  }
+}
+
+/*
+  Left Shift key control
+*/
+void lshft_finished (qk_tap_dance_state_t *state, void *user_data) {
+  xtap_state.state = cur_modifier_dance(state);
+  switch (xtap_state.state) {
+    case HOLD: register_code(KC_LSFT); break;
+    // (
+    case SINGLE_TAP: SEND_STRING(SS_LSFT(SS_TAP(X_9))); break;
+    // [
+    case DOUBLE_TAP: SEND_STRING(SS_TAP(X_LBRC)); break;
+  }
+}
+
+void lshft_reset (qk_tap_dance_state_t *state, void *user_data) {
+  switch (xtap_state.state) {
+    case HOLD: unregister_code(KC_LSFT); break;
+  }
+
+  xtap_state.state = 0;
+}
+
+/*
+  Right Shift key control
+*/
+void rshft_finished (qk_tap_dance_state_t *state, void *user_data) {
+  xtap_state.state = cur_modifier_dance(state);
+  switch (xtap_state.state) {
+    case HOLD: register_code(KC_RSFT); break;
+    // (
+    case SINGLE_TAP: SEND_STRING(SS_RSFT(SS_TAP(X_0))); break;
+    // [
+    case DOUBLE_TAP: SEND_STRING(SS_TAP(X_RBRC)); break;
+  }
+}
+
+void rshft_reset (qk_tap_dance_state_t *state, void *user_data) {
+  unregister_code(KC_RSFT);
+  xtap_state.state = 0;
+}
+
+/*
+  Left Control key control
+*/
+void lctrl_finished (qk_tap_dance_state_t *state, void *user_data) {
+  xtap_state.state = cur_modifier_dance(state);
+  switch (xtap_state.state) {
+    case HOLD: register_code(KC_LCTRL); break;
+    // {
+    case SINGLE_TAP: SEND_STRING(SS_LSFT(SS_TAP(X_LBRC))); break;
+  }
+}
+
+void lctrl_reset (qk_tap_dance_state_t *state, void *user_data) {
+  unregister_code(KC_LCTRL);
   xtap_state.state = 0;
 }
 
 qk_tap_dance_action_t tap_dance_actions[] = {
-  [T_HME]     = ACTION_TAP_DANCE_FN_ADVANCED(NULL,home_finished, home_reset),
-  [T_KCM]     = ACTION_TAP_DANCE_FN_ADVANCED(NULL,m_finished, m_reset),
-  [T_SLS]     = ACTION_TAP_DANCE_FN_ADVANCED(NULL,slash_finished, slash_reset),
+  [T_HME] = ACTION_TAP_DANCE_FN_ADVANCED(NULL,home_finished, tap_dance_reset),
+  [T_KCM] = ACTION_TAP_DANCE_FN_ADVANCED(NULL,m_finished, tap_dance_reset),
+  [T_SLS] = ACTION_TAP_DANCE_FN_ADVANCED(NULL,slash_finished, tap_dance_reset),
+  [T_PDN] = ACTION_TAP_DANCE_FN_ADVANCED(NULL,pg_down_finished, tap_dance_reset),
+  [T_PUP] = ACTION_TAP_DANCE_FN_ADVANCED(NULL,pg_up_finished, tap_dance_reset),
+  [T_LSH] = ACTION_TAP_DANCE_FN_ADVANCED(NULL,lshft_finished, lshft_reset),
+  [T_RSH] = ACTION_TAP_DANCE_FN_ADVANCED(NULL,rshft_finished, rshft_reset),
+  [T_LCL] = ACTION_TAP_DANCE_FN_ADVANCED(NULL,lctrl_finished, lctrl_reset),
 };
