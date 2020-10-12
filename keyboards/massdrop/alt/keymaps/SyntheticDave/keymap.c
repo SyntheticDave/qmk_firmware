@@ -15,6 +15,7 @@ bool work_mode = false;
 
 #include "tap_dance/tap_dance.c"
 #include "led_control/led_control.c"
+#include "leader/leader.c"
 
 enum alt_keycodes {
     U_T_AUTO = SAFE_RANGE,  // USB Extra Port Toggle Auto Detect / Always Active
@@ -190,7 +191,6 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     */
 };
 
-LEADER_EXTERNS();
 
 void keyboard_post_init_user(void) {
     // Customise these values to desired behaviour
@@ -201,61 +201,12 @@ void keyboard_post_init_user(void) {
     print("keyboard started\n");
 }
 
-
 // Runs just one time when the keyboard initializes.
 void matrix_init_user(void) { print("keyboard starting\n"); };
 
-// HACK: Can't figure out how to determine current hue/saturation, so using this workaround
-void toggle_work_mode(void) {
-    work_mode = !work_mode;
-
-    if(work_mode) {
-        SEND_STRING(SS_LCTL(SS_LGUI(SS_LALT(SS_TAP(X_UP)))));
-    } else {
-        SEND_STRING(SS_LCTL(SS_LGUI(SS_LALT(SS_TAP(X_DOWN)))));
-    }
-}
-
 // Runs constantly in the background, in a loop.
 void matrix_scan_user(void) {
-    // Handle Leader Key Behaviour
-    LEADER_DICTIONARY() {
-        leading = false;
-
-        SEQ_ONE_KEY(KC_GESC) {
-            // Put the keyboard into bootloading mode for flashing
-            reset_keyboard();
-        }
-        SEQ_ONE_KEY(KC_M) {
-            layer_move(MAC);  // Activate Mac OS Layer (only)
-        }
-        SEQ_TWO_KEYS(KC_M, KC_M) {
-            layer_move(MAC);  // Activate Mac OS Layer (only)
-            toggle_work_mode();
-        }
-        // Double tap leader key
-        SEQ_ONE_KEY(KC_LEAD) {
-          // TODO: Consider sending backspace on double lead (has moved to the backspace key
-          // TODO: Only activate mac oneshot layer if we're on the mac base layer or the osl
-          // layer_state_is(MAC)
-          // Doesn't act like a oneshot layer here, so not particularly useful. I'm not sure what the call to active a layer as a oneshot is, as I can't find it in the docs.
-          layer_invert(MAC_ONE_SHOTS);
-        }
-        SEQ_ONE_KEY(KC_X) {
-          toggle_work_mode();
-        }
-        SEQ_ONE_KEY(KC_W) {
-            layer_move(WIN);  // Activate Windows Layer (only)
-        }
-        SEQ_ONE_KEY(KC_G) {
-            layer_move(WIN);       // Activate Windows Layer (only)
-            layer_on(WIN_GAMING);  // Then activate the gaming layer
-        }
-        SEQ_ONE_KEY(KC_K) {
-            layer_invert(KB_CONFIG);  // Toggle the keyboard config layer
-        }
-        leader_end();
-    }
+    handle_leader_key();
 };
 
 #define MODS_SHIFT (get_mods() & MOD_BIT(KC_LSHIFT) || get_mods() & MOD_BIT(KC_RSHIFT))

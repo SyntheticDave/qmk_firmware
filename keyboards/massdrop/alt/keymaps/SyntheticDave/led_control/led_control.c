@@ -249,3 +249,16 @@ void rgb_matrix_indicators_user(void)
         rgb_matrix_set_collection_color(base_leds_left, sizeof(base_leds_left) / sizeof(uint8_t), RGB_RED);
     }
 }
+
+// HACK: Can't figure out how to determine current hue/saturation, so using this workaround
+void toggle_work_mode(void) {
+    work_mode = !work_mode;
+
+    if(work_mode) {
+        // Bright Office Lights
+        SEND_STRING(SS_LCTL(SS_LGUI(SS_LALT(SS_TAP(X_UP)))));
+    } else {
+        // Relaxed Office Lights
+        SEND_STRING(SS_LCTL(SS_LGUI(SS_LALT(SS_TAP(X_DOWN)))));
+    }
+}
