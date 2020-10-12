@@ -1,3 +1,6 @@
+// Boy, I hope nobody finds this terrible code on the internet
+// TODO: Split into multiple files - Setup, Lighting, Tap Dance, Keystroke Processing
+
 #include QMK_KEYBOARD_H
 
 #include <print.h>
@@ -18,6 +21,7 @@ enum alt_keycodes {
     TYP_EXT,                // Type exit and press enter
     TYP_EXB,                // Type exit! and press enter
     MS_ENT,                 // MAC special layer enter
+    IVT_MIN,               // Inverted KC_MINS
 };
 
 // LED Sets
@@ -39,6 +43,8 @@ uint8_t arrow_keys[] = {56,64,65,66};
 #define SA_QUOT S(A(KC_QUOT))   // Alt + Shift + ' - VS Code Terminal Focus
 #define VS_FLIP HYPR(KC_SCOLON) // Rails - FlipFlop
 #define VS_DEFN KC_F12
+#define VS_NMCH C(A(KC_DOT))    // Next Match (+ Shift to select next match)
+#define VS_PMCH C(A(KC_COMM))    // Previous Match (+ Shift to undo last cursor)
 
 // CMD + ... shortcuts - Making up for the lack of a right CMD key
 #define G_BSPC G(KC_BSPC)       // Meta + Backspace
@@ -84,6 +90,7 @@ uint8_t arrow_keys[] = {56,64,65,66};
 //  Workflow Triggers
 //      Code
 #define S3_OP MEH(KC_3)     // S3 Bucket
+#define S3_ROP HYPR(KC_3)   // s3 Bucket with previous client
 #define NEP_MOD MEH(KC_M)   // Rails Model
 #define NEP_AAT MEH(KC_A)   // Rails Model Attribute
 //      House Lights
@@ -123,7 +130,11 @@ enum {
     T_LSH,
     T_RSH,
     T_LCL,
+    T_LAT,
+    T_RAT,
+    T_S3C,
     T_FNC,
+    T_FNV,
 };
 
 #define TD_HME TD(T_HME)
@@ -134,21 +145,29 @@ enum {
 #define TD_LSH TD(T_LSH)
 #define TD_RSH TD(T_RSH)
 #define TD_LCL TD(T_LCL)
+#define TD_LAT TD(T_LAT)
+#define TD_RAT TD(T_RAT)
+#define TD_S3C TD(T_S3C)
+#define TD_FNC TD(T_FNC)
+#define TD_FNV TD(T_FNV)
 
 int cur_dance (qk_tap_dance_state_t *state);
 
 void tap_dance_reset (qk_tap_dance_state_t *state, void *user_data);
 void home_finished (qk_tap_dance_state_t *state, void *user_data);
+void s3c_finished (qk_tap_dance_state_t *state, void *user_data);
 void m_finished (qk_tap_dance_state_t *state, void *user_data);
+void fn_c_finished (qk_tap_dance_state_t *state, void *user_data);
+void fn_v_finished (qk_tap_dance_state_t *state, void *user_data);
 void slash_finished (qk_tap_dance_state_t *state, void *user_data);
 void pg_down_finished (qk_tap_dance_state_t *state, void *user_data);
 void pg_up_finished (qk_tap_dance_state_t *state, void *user_data);
-void lshft_finished (qk_tap_dance_state_t *state, void *user_data);
-void lshft_reset (qk_tap_dance_state_t *state, void *user_data);
-void rshft_finished (qk_tap_dance_state_t *state, void *user_data);
-void rshft_reset (qk_tap_dance_state_t *state, void *user_data);
 void lctrl_finished (qk_tap_dance_state_t *state, void *user_data);
 void lctrl_reset (qk_tap_dance_state_t *state, void *user_data);
+void lalt_finished (qk_tap_dance_state_t *state, void *user_data);
+void lalt_finished (qk_tap_dance_state_t *state, void *user_data);
+void ralt_reset (qk_tap_dance_state_t *state, void *user_data);
+void ralt_reset (qk_tap_dance_state_t *state, void *user_data);
 
 // ==================
 // Key Map
@@ -156,11 +175,11 @@ void lctrl_reset (qk_tap_dance_state_t *state, void *user_data);
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [DEFAULT] = LAYOUT_65_ansi_blocker(
-        KC_GESC, KC_1,    KC_2,    KC_3,    KC_4,    KC_5,    KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    KC_MINS, KC_EQL,  KC_BSPC, KC_DEL,  \
+        KC_GESC, KC_1,    KC_2,    KC_3,    KC_4,    KC_5,    KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    KC_MINS, KC_EQL,  KC_LEAD, KC_DEL,  \
         KC_TAB,  KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,    KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    KC_LBRC, KC_RBRC, KC_BSLS, KC_HOME, \
-        KC_LEAD, KC_A,    KC_S,    KC_D,    KC_F,    KC_G,    KC_H,    KC_J,    KC_K,    KC_L,    KC_SCLN, KC_QUOT,          KC_ENT,  KC_PGUP, \
-        TD_LSH , KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,    KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH, TD_RSH ,          KC_UP,   KC_PGDN, \
-        TD_LCL , KC_LALT, KC_LGUI,                            KC_SPC,                             KC_RALT, KC_RGUI, KC_LEFT, KC_DOWN, KC_RGHT  \
+        KC_BSPC, KC_A,    KC_S,    KC_D,    KC_F,    KC_G,    KC_H,    KC_J,    KC_K,    KC_L,    KC_SCLN, KC_QUOT,          KC_ENT,  KC_PGUP, \
+        KC_LSPO, KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,    KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH, KC_RSPC,          KC_UP ,  KC_PGDN, \
+        TD_LCL , TD_LAT,  KC_LGUI,                            KC_SPC,                             TD_RAT , KC_RGUI, KC_LEFT, KC_DOWN, KC_RGHT  \
     ),
     [MAC] = LAYOUT_65_ansi_blocker(
         _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, \
@@ -172,15 +191,15 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [MAC_SPECIAL] = LAYOUT_65_ansi_blocker(
         KC_GRV ,  KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,  G_BSPC, TRELLO , \
         _______, _______, TYP_EXB, TYP_EXT, _______, _______, _______, _______, _______, _______, CG_LEFT, AS_LBRC, AS_RBRC, CG_RGHT, TD_HME , \
-        KC_CAPS, NEP_AAT,  S3_OP , _______, _______, _______, _______, _______, _______, _______, VS_FLIP, SA_QUOT,           MS_ENT, TD_PUP , \
-        SNK_TOG, _______, _______, _______, _______, _______, _______, TD_KCM , _______, _______ ,TD_SLS , _______,          KC_PGUP, TD_PDN , \
+        KC_CAPS, NEP_AAT, TD_S3C , _______, _______, _______, _______, _______, _______, _______, VS_FLIP, SA_QUOT,           MS_ENT, TD_PUP , \
+        SNK_TOG, _______, _______, TD_FNC , TD_FNV , _______, _______, TD_KCM , VS_PMCH, VS_NMCH ,TD_SLS , _______,          KC_PGUP, TD_PDN , \
         _______, _______, _______,                            MAC_OSL,                             MAC_FN, _______, KC_HOME, KC_PGDN, KC_END   \
     ),
     [MAC_ONE_SHOTS] = LAYOUT_65_ansi_blocker(
         KC_ESC , _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,SPOT_RFP,SPOT_ATP, _______, _______, \
         _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,SPOT_PPL, _______, _______, _______, _______, \
-        KC_LEAD, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          KC_MPLY, HPR_RGT, \
-        _______, _______, _______, _______, _______, _______, _______, _______, _______, SPOT_QU, SPOT_CT, _______,          _______, HPR_LFT, \
+        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          KC_MPLY, HPR_LFT, \
+        _______, _______, _______, _______, _______, _______, _______, _______, _______, SPOT_QU, SPOT_CT, _______,          _______, HPR_RGT, \
         _______, _______, _______,                            _______,                            _______, _______, KC_MPRV, _______, KC_MNXT  \
     ),
     [WIN] = LAYOUT_65_ansi_blocker(
@@ -212,7 +231,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         _______, _______, _______,                            KC_UNDS,                            _______, _______, _______, _______, _______  \
     ),
     [KB_CONFIG] = LAYOUT_65_ansi_blocker(
-        RESET  , XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
+        RESET  , XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, _______, XXXXXXX, \
         XXXXXXX, RGB_HUI, RGB_SAI, RGB_VAI, RGB_MOD, RGB_SPI, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, RGB_PRV, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
         _______, RGB_HUD, RGB_SAD, RGB_VAD,RGB_RMOD, RGB_SPD, XXXXXXX, XXXXXXX, _______, _______, XXXXXXX, XXXXXXX,          XXXXXXX, XXXXXXX, \
         XXXXXXX, XXXXXXX, RGB_WRK, RGB_TOG, XXXXXXX, MD_BOOT, NK_TOGG, DBG_TOG, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,          DST_WRK, XXXXXXX, \
@@ -262,8 +281,8 @@ void matrix_init_user(void) { print("keyboard starting\n"); };
 
 bool r_alt_down = false;
 bool meta_down = false;
-bool work_mode = false;
 bool mac_fn_down = false;
+bool work_mode = false;
 
 // HACK: Can't figure out how to determine current hue/saturation, so using this workaround
 void toggle_work_mode(void) {
@@ -273,10 +292,10 @@ void toggle_work_mode(void) {
     if(work_mode) {
         // DST_WRK LCAG(KC_UP)
         // SS_HYPR doesn't work?
-        SEND_STRING(SS_LCTL(SS_LSFT(SS_LGUI(SS_LALT("1")))));
+        SEND_STRING(SS_LCTL(SS_LGUI(SS_LALT(SS_TAP(X_UP)))));
     } else {
-        SEND_STRING(SS_LCTL(SS_LSFT(SS_LGUI(SS_LALT("2")))));
         // DST_RLX LCAG(KC_DOWN)
+        SEND_STRING(SS_LCTL(SS_LGUI(SS_LALT(SS_TAP(X_DOWN)))));
     }
 }
 
@@ -310,7 +329,7 @@ void show_mac_spotify_leds(void) {
 }
 
 void show_mac_vs_code_leds(void) {
-    uint8_t lit_keys[] = {25, 26, 27, 28, 40, 41, 54};
+    uint8_t lit_keys[] = {25, 26, 27, 28, 40, 41, 47, 48, 52, 53, 54};
     rgb_matrix_set_collection_color(lit_keys, sizeof(lit_keys) / sizeof(uint8_t), RGB_BLUE);
 }
 
@@ -456,9 +475,8 @@ void show_kb_config_keys(void) {
     rgb_matrix_set_color(20, RGB_YELLOW);           // slower
     rgb_matrix_set_color(35, RGB_YELLOW);           // faster
 
-    // Light KL, as they're the exit keys for this layer
+    // Light K, as it's the exit key for this layer
     rgb_matrix_set_color(38, 0x5A,0x5A,0x5A);
-    rgb_matrix_set_color(39, 0x5A,0x5A,0x5A);
 
     // Dave Study Lighting
     uint8_t study_keys[] = {56,64,65,66};
@@ -517,26 +535,35 @@ void matrix_scan_user(void) {
         leading = false;
 
         SEQ_ONE_KEY(KC_GESC) {
-            layer_clear();  // Disable all layers except base
+            // Put the keyboard into bootloading mode for flashing
+            reset_keyboard();
         }
         SEQ_ONE_KEY(KC_M) {
             layer_move(MAC);  // Activate Mac OS Layer (only)
         }
+        SEQ_TWO_KEYS(KC_M, KC_M) {
+            layer_move(MAC);  // Activate Mac OS Layer (only)
+            toggle_work_mode();
+        }
         // Double tap leader key
         SEQ_ONE_KEY(KC_LEAD) {
+          // TODO: Consider sending backspace on double lead (has moved to the backspace key)
           // TODO: Only activate mac oneshot layer if we're on the mac base layer or the osl
-          // REVISE: Consider triggering on leader + space
           // layer_state_is(MAC)
+          // Doesn't act like a oneshot layer here, so not particularly useful. I'm not sure what the call to active a layer as a oneshot is, as I can't find it in the docs.
           layer_invert(MAC_ONE_SHOTS);
+        }
+        SEQ_ONE_KEY(KC_X) {
+          toggle_work_mode();
         }
         SEQ_ONE_KEY(KC_W) {
             layer_move(WIN);  // Activate Windows Layer (only)
         }
-        SEQ_TWO_KEYS(KC_G, KC_G) {
+        SEQ_ONE_KEY(KC_G) {
             layer_move(WIN);       // Activate Windows Layer (only)
             layer_on(WIN_GAMING);  // Then activate the gaming layer
         }
-        SEQ_TWO_KEYS(KC_K, KC_L) {
+        SEQ_ONE_KEY(KC_K) {
             layer_invert(KB_CONFIG);  // Toggle the keyboard config layer
         }
         leader_end();
@@ -622,7 +649,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 toggle_work_mode();
             }
             return false;
-        case KC_RALT:
+        case TD_RAT:
             r_alt_down = record->event.pressed;
             return true;
         case MAC_FN:
@@ -652,6 +679,20 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         case TYP_EXB:
             if (record->event.pressed) {
                 SEND_STRING("exit!\n");
+            }
+            return false;
+        // Inverted minus — Sends underscore by default
+        case IVT_MIN:
+            if (record->event.pressed) {
+                // FIXME: Only works with left shift
+                if(MODS_SHIFT) {
+                    unregister_code(KC_LSHIFT);
+                    register_code(KC_MINS);
+                    unregister_code(KC_MINS);
+                    register_code(KC_LSHIFT);
+                } else {
+                    SEND_STRING("_");
+                }
             }
             return false;
         default:
@@ -797,6 +838,47 @@ void slash_finished (qk_tap_dance_state_t *state, void *user_data) {
 }
 
 /*
+ Fn + S key control
+*/
+void s3c_finished (qk_tap_dance_state_t *state, void *user_data) {
+  xtap_state.state = cur_dance(state);
+  switch (xtap_state.state) {
+    // S3 Command
+    case SINGLE_TAP: SEND_STRING(SS_LCTL(SS_LSFT(SS_LALT(SS_TAP(X_3))))); break;
+    // S3 Command with last used client
+    case DOUBLE_TAP: SEND_STRING(SS_LCTL(SS_LSFT(SS_LGUI(SS_LALT(SS_TAP(X_3)))))); break;
+  }
+}
+
+/*
+ Fn + V key control
+*/
+void fn_v_finished (qk_tap_dance_state_t *state, void *user_data) {
+  xtap_state.state = cur_dance(state);
+  switch (xtap_state.state) {
+    // Meh V - Trigger text massager on selected text
+    case SINGLE_TAP: SEND_STRING(SS_LCTL(SS_LSFT(SS_LALT(SS_TAP(X_V))))); break;
+    // Ctrl + Alt + V - Search Snippets Lab
+    case DOUBLE_TAP: SEND_STRING(SS_LCTL(SS_LALT(SS_TAP(X_V)))); break;
+    // Hyper V - Trigger enhanced snippets on selected text
+    case TRIPLE_TAP: SEND_STRING(SS_LCTL(SS_LSFT(SS_LGUI(SS_LALT(SS_TAP(X_V)))))); break;
+  }
+}
+
+/*
+ Fn + C key control
+*/
+void fn_c_finished (qk_tap_dance_state_t *state, void *user_data) {
+  xtap_state.state = cur_dance(state);
+  switch (xtap_state.state) {
+    // Meh C - Trigger text massager on clipboard text
+    case SINGLE_TAP: SEND_STRING(SS_LCTL(SS_LSFT(SS_LALT(SS_TAP(X_C))))); break;
+    // Hyper B - Trigger enhanced snippets on clipboard text (HYPER C being swallowed by something)
+    case DOUBLE_TAP: SEND_STRING(SS_LCTL(SS_LSFT(SS_LGUI(SS_LALT(SS_TAP(X_B)))))); break;
+  }
+}
+
+/*
  Fn + Pg Down key control
 */
 void pg_down_finished (qk_tap_dance_state_t *state, void *user_data) {
@@ -887,6 +969,41 @@ void lctrl_reset (qk_tap_dance_state_t *state, void *user_data) {
   xtap_state.state = 0;
 }
 
+/*
+  Left Alt Key control
+*/
+void lalt_finished (qk_tap_dance_state_t *state, void *user_data) {
+  xtap_state.state = cur_modifier_dance(state);
+  switch (xtap_state.state) {
+    case HOLD: register_code(KC_LALT); break;
+    // {
+    case SINGLE_TAP: SEND_STRING(SS_TAP(X_LBRC)); break;
+  }
+}
+
+void lalt_reset (qk_tap_dance_state_t *state, void *user_data) {
+  unregister_code(KC_LALT);
+  xtap_state.state = 0;
+}
+
+/*
+  Right Alt Key control
+*/
+void ralt_finished (qk_tap_dance_state_t *state, void *user_data) {
+  xtap_state.state = cur_modifier_dance(state);
+  switch (xtap_state.state) {
+    case HOLD: register_code(KC_RALT); break;
+    // {
+    case SINGLE_TAP: SEND_STRING(SS_TAP(X_RBRC)); break;
+    case DOUBLE_TAP: SEND_STRING(SS_LSFT(SS_TAP(X_RBRC))); break;
+  }
+}
+
+void ralt_reset (qk_tap_dance_state_t *state, void *user_data) {
+  unregister_code(KC_RALT);
+  xtap_state.state = 0;
+}
+
 qk_tap_dance_action_t tap_dance_actions[] = {
   [T_HME] = ACTION_TAP_DANCE_FN_ADVANCED(NULL,home_finished, tap_dance_reset),
   [T_KCM] = ACTION_TAP_DANCE_FN_ADVANCED(NULL,m_finished, tap_dance_reset),
@@ -896,4 +1013,9 @@ qk_tap_dance_action_t tap_dance_actions[] = {
   [T_LSH] = ACTION_TAP_DANCE_FN_ADVANCED(NULL,lshft_finished, lshft_reset),
   [T_RSH] = ACTION_TAP_DANCE_FN_ADVANCED(NULL,rshft_finished, rshft_reset),
   [T_LCL] = ACTION_TAP_DANCE_FN_ADVANCED(NULL,lctrl_finished, lctrl_reset),
+  [T_LAT] = ACTION_TAP_DANCE_FN_ADVANCED(NULL,lalt_finished, lalt_reset),
+  [T_RAT] = ACTION_TAP_DANCE_FN_ADVANCED(NULL,ralt_finished, ralt_reset),
+  [T_S3C] = ACTION_TAP_DANCE_FN_ADVANCED(NULL,s3c_finished, tap_dance_reset),
+  [T_FNC] = ACTION_TAP_DANCE_FN_ADVANCED(NULL,fn_c_finished, tap_dance_reset),
+  [T_FNV] = ACTION_TAP_DANCE_FN_ADVANCED(NULL,fn_v_finished, tap_dance_reset),
 };
