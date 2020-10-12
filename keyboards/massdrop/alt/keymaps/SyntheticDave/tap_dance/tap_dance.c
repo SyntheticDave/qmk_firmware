@@ -67,6 +67,7 @@ enum {
     T_S3C,
     T_FNC,
     T_FNV,
+    T_FNF,
 };
 
 #define TD_HME TD(T_HME)
@@ -82,6 +83,7 @@ enum {
 #define TD_S3C TD(T_S3C)
 #define TD_FNC TD(T_FNC)
 #define TD_FNV TD(T_FNV)
+#define TD_FNF TD(T_FNF)
 
 int cur_dance (qk_tap_dance_state_t *state);
 
@@ -91,6 +93,7 @@ void s3c_finished (qk_tap_dance_state_t *state, void *user_data);
 void m_finished (qk_tap_dance_state_t *state, void *user_data);
 void fn_c_finished (qk_tap_dance_state_t *state, void *user_data);
 void fn_v_finished (qk_tap_dance_state_t *state, void *user_data);
+void fn_f_finished (qk_tap_dance_state_t *state, void *user_data);
 void slash_finished (qk_tap_dance_state_t *state, void *user_data);
 void pg_down_finished (qk_tap_dance_state_t *state, void *user_data);
 void pg_up_finished (qk_tap_dance_state_t *state, void *user_data);
@@ -204,6 +207,25 @@ void s3c_finished (qk_tap_dance_state_t *state, void *user_data) {
     case SINGLE_TAP: SEND_STRING(SS_LCTL(SS_LSFT(SS_LALT(SS_TAP(X_3))))); break;
     // S3 Command with last used client
     case DOUBLE_TAP: SEND_STRING(SS_LCTL(SS_LSFT(SS_LGUI(SS_LALT(SS_TAP(X_3)))))); break;
+  }
+}
+
+/*
+ Fn + F key control
+*/
+void fn_f_finished (qk_tap_dance_state_t *state, void *user_data) {
+  xtap_state.state = cur_dance(state);
+  switch (xtap_state.state) {
+    // VS Code - Show File in Sidebar
+    case SINGLE_TAP:
+        SEND_STRING(SS_LGUI(SS_TAP(X_K)));
+        SEND_STRING(SS_LGUI(SS_TAP(X_SCLN)));
+        break;
+    // VS Code - Show File in Finder
+    case SINGLE_HOLD:
+        SEND_STRING(SS_LGUI(SS_TAP(X_K)));
+        SEND_STRING(SS_LGUI(SS_TAP(X_QUOT)));
+        break;
   }
 }
 
@@ -375,4 +397,5 @@ qk_tap_dance_action_t tap_dance_actions[] = {
   [T_S3C] = ACTION_TAP_DANCE_FN_ADVANCED(NULL,s3c_finished, tap_dance_reset),
   [T_FNC] = ACTION_TAP_DANCE_FN_ADVANCED(NULL,fn_c_finished, tap_dance_reset),
   [T_FNV] = ACTION_TAP_DANCE_FN_ADVANCED(NULL,fn_v_finished, tap_dance_reset),
+  [T_FNF] = ACTION_TAP_DANCE_FN_ADVANCED(NULL,fn_f_finished, tap_dance_reset),
 };

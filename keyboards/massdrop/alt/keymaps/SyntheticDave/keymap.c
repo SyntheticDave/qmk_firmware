@@ -118,7 +118,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [MAC_SPECIAL] = LAYOUT_65_ansi_blocker(
         KC_GRV ,  KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,  G_BSPC, TRELLO , \
         _______, _______, TYP_EXB, TYP_EXT, _______, _______, _______, _______, _______, _______, CG_LEFT, AS_LBRC, AS_RBRC, CG_RGHT, TD_HME , \
-        KC_CAPS, NEP_AAT, TD_S3C , _______, _______, _______, _______, _______, _______, _______, VS_FLIP, SA_QUOT,           MS_ENT, TD_PUP , \
+        KC_CAPS, NEP_AAT, TD_S3C , _______, TD_FNF , _______, _______, _______, _______, _______, VS_FLIP, SA_QUOT,           MS_ENT, TD_PUP , \
         SNK_TOG, _______, _______, TD_FNC , TD_FNV , _______, _______, TD_KCM , VS_PMCH, VS_NMCH ,TD_SLS , _______,          KC_PGUP, TD_PDN , \
         _______, _______, _______,                            MAC_OSL,                             MAC_FN, _______, KC_HOME, KC_PGDN, KC_END   \
     ),
@@ -190,7 +190,6 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
     */
 };
-
 
 void keyboard_post_init_user(void) {
     // Customise these values to desired behaviour
@@ -297,6 +296,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         case MS_ENT:
             // Mac Special layer enter handling
             if(record->event.pressed) {
+                // Just send enter if we're effectively sending fn
                 if(mac_fn_down) {
                     SEND_STRING(SS_TAP(X_ENT));
                     return false;
@@ -323,7 +323,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         // Inverted minus — Sends underscore by default
         case IVT_MIN:
             if (record->event.pressed) {
-                // FIXME: Only works with left shift
+                // FIXME: Handle both shifts
                 if(MODS_SHIFT) {
                     unregister_code(KC_LSHIFT);
                     register_code(KC_MINS);
