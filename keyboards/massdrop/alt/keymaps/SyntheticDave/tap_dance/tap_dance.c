@@ -32,6 +32,11 @@
  */
 
 // TODO: Define hyper, meh, etc. so we can stop writing SS_LCTL(SS_LSFT(SS_TAP everywhere
+// TODO: Define PgUp and PgDn (without Fn as Tap Dance keys. Press to trigger macro, hold to record)
+// Should be able to call process_record_dynamic_macro(uint16_t keycode, keyrecord_t *record) manually with my own keys, and pass DYN_REC_START1, DYN_MACRO_PLAY1, DYN_REC_STOP to it
+// if (!process_record_dynamic_macro(keycode, record)) {
+//     return false;
+// }
 
 #define TAPPING_TOGGLE 2
 
@@ -68,6 +73,8 @@ enum {
     T_FNC,
     T_FNV,
     T_FNF,
+    T_DM1,
+    T_DM2,
 };
 
 #define TD_HME TD(T_HME)
@@ -84,6 +91,8 @@ enum {
 #define TD_FNC TD(T_FNC)
 #define TD_FNV TD(T_FNV)
 #define TD_FNF TD(T_FNF)
+#define TD_DM1 TD(T_DM1)
+#define TD_DM2 TD(T_DM2)
 
 int cur_dance (qk_tap_dance_state_t *state);
 
@@ -103,6 +112,8 @@ void lalt_finished (qk_tap_dance_state_t *state, void *user_data);
 void lalt_finished (qk_tap_dance_state_t *state, void *user_data);
 void ralt_reset (qk_tap_dance_state_t *state, void *user_data);
 void ralt_reset (qk_tap_dance_state_t *state, void *user_data);
+void dm1_finished (qk_tap_dance_state_t *state, void *user_data);
+void dm2_finished (qk_tap_dance_state_t *state, void *user_data);
 
 int cur_dance (qk_tap_dance_state_t *state) {
   if (state->count == 1) {
@@ -164,10 +175,10 @@ void tap_dance_reset (qk_tap_dance_state_t *state, void *user_data) {
 void home_finished (qk_tap_dance_state_t *state, void *user_data) {
   xtap_state.state = cur_dance(state);
   switch (xtap_state.state) {
-    // Finder on single tap
-    case SINGLE_TAP: SEND_STRING(SS_LCTL(SS_LSFT(SS_LGUI(SS_LALT(SS_TAP(X_F14)))))); break;
-    // Browser on double tap
-    case DOUBLE_TAP: SEND_STRING(SS_LCTL(SS_LSFT(SS_LGUI(SS_LALT(SS_TAP(X_F18)))))); break;
+    // Browser on single tap
+    case SINGLE_TAP: SEND_STRING(SS_LCTL(SS_LSFT(SS_LGUI(SS_LALT(SS_TAP(X_F18)))))); break;
+    // Finder on double tap
+    case DOUBLE_TAP: SEND_STRING(SS_LCTL(SS_LSFT(SS_LGUI(SS_LALT(SS_TAP(X_F14)))))); break;
   }
 }
 
@@ -383,6 +394,57 @@ void ralt_reset (qk_tap_dance_state_t *state, void *user_data) {
   xtap_state.state = 0;
 }
 
+// Dynamic Macro Recording/Playing control
+void dm_finished(qk_tap_dance_state_t *state, void *user_data, uint16_t rec_key, uint16_t play_key, bool *rec_flag) {
+  xtap_state.state = cur_dance(state);
+
+  keyrecord_t kr;
+  // fudging pressed state, regardless of current state, to make dynamic macros trigger appropriately
+  kr.event.pressed = false;
+  uint16_t action = DYN_REC_STOP;
+  bool valid = false;
+
+  switch (xtap_state.state) {
+    // Play macro
+    case SINGLE_TAP:
+        action = play_key;
+        valid = true;
+        break;
+    // Finish macro recording
+    case DOUBLE_TAP:
+        action = DYN_REC_STOP;
+        kr.event.pressed = true;
+        *rec_flag = false;
+        valid = true;
+        break;
+    // Start macro recording
+    case DOUBLE_HOLD:
+        action = rec_key;
+        valid = true;
+        *rec_flag = true;
+        break;
+  }
+
+  //  Call the regular macro processing with our constructed event and key code
+  if(valid) {
+    process_dynamic_macro( action, &kr);
+  }
+}
+
+/*
+    Pg Up key control (Dynamic Macro 1)
+*/
+void dm1_finished (qk_tap_dance_state_t *state, void *user_data) {
+    dm_finished(state, user_data, DYN_REC_START1, DYN_MACRO_PLAY1, &recording_macro_1);
+}
+
+/*
+    Pg Dn key control (Dynamic Macro 2)
+*/
+void dm2_finished (qk_tap_dance_state_t *state, void *user_data) {
+    dm_finished(state, user_data, DYN_REC_START2, DYN_MACRO_PLAY2, &recording_macro_2);
+}
+
 qk_tap_dance_action_t tap_dance_actions[] = {
   [T_HME] = ACTION_TAP_DANCE_FN_ADVANCED(NULL,home_finished, tap_dance_reset),
   [T_KCM] = ACTION_TAP_DANCE_FN_ADVANCED(NULL,m_finished, tap_dance_reset),
@@ -398,4 +460,6 @@ qk_tap_dance_action_t tap_dance_actions[] = {
   [T_FNC] = ACTION_TAP_DANCE_FN_ADVANCED(NULL,fn_c_finished, tap_dance_reset),
   [T_FNV] = ACTION_TAP_DANCE_FN_ADVANCED(NULL,fn_v_finished, tap_dance_reset),
   [T_FNF] = ACTION_TAP_DANCE_FN_ADVANCED(NULL,fn_f_finished, tap_dance_reset),
+  [T_DM1] = ACTION_TAP_DANCE_FN_ADVANCED(NULL,dm1_finished, tap_dance_reset),
+  [T_DM2] = ACTION_TAP_DANCE_FN_ADVANCED(NULL,dm2_finished, tap_dance_reset),
 };

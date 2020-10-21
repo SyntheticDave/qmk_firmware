@@ -1,5 +1,6 @@
 enum alt_keycodes {
     U_T_AUTO = SAFE_RANGE,  // USB Extra Port Toggle Auto Detect / Always Active
+    DYNAMIC_MACRO_RANGE,
     U_T_AGCR,               // USB Toggle Automatic GCR control
     DBG_TOG,                // DEBUG Toggle On / Off
     DBG_MTRX,               // DEBUG Toggle Matrix Prints

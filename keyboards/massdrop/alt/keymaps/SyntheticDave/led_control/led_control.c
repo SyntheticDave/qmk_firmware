@@ -25,6 +25,18 @@ void key_leds_off(bool top_row) {
     }
 }
 
+// Highlight macro key in red if currently recording
+void show_macro_recording_keys(void) {
+    if(recording_macro_1) {
+        rgb_matrix_set_color(43, RGB_RED);
+        rgb_matrix_set_color(1, RGB_RED);
+    } else if (recording_macro_2)
+    {
+        rgb_matrix_set_color(57, RGB_RED);
+        rgb_matrix_set_color(2, RGB_RED);
+    }
+}
+
 void show_mac_base_leds(void) {
     rgb_matrix_set_collection_color(base_leds_back, sizeof(base_leds_back) / sizeof(uint8_t), RGB_MAGENTA);
 }
@@ -236,6 +248,7 @@ void show_custom_lighting(void) {
         show_mac_meta_leds();
     }
 
+    show_macro_recording_keys();
     show_layer_indicator(layer);
 }
 
@@ -245,6 +258,7 @@ void rgb_matrix_indicators_user(void)
 
 	uint8_t this_led = host_keyboard_leds();
 
+    // FIXME: I seem to have broken the Capslock lighting
     if (this_led & (1 << USB_LED_CAPS_LOCK)) {
         rgb_matrix_set_collection_color(base_leds_left, sizeof(base_leds_left) / sizeof(uint8_t), RGB_RED);
     }

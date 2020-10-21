@@ -1,6 +1,3 @@
-// Boy, I hope nobody finds this terrible code on the internet
-// TODO: Split into multiple files - Setup, Lighting, Tap Dance, Keystroke Processing
-
 #include QMK_KEYBOARD_H
 
 #include <print.h>
@@ -10,6 +7,8 @@ bool r_alt_down = false;
 bool meta_down = false;
 bool mac_fn_down = false;
 bool work_mode = false;
+bool recording_macro_1 = false;
+bool recording_macro_2 = false;
 
 #include "layers/layers_definitions.c"
 #include "tap_dance/tap_dance.c"
@@ -149,6 +148,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             }
             return false;
         // Inverted minus — Sends underscore by default
+        // Not currently in use
         case IVT_MIN:
             if (record->event.pressed) {
                 // FIXME: Handle both shifts
