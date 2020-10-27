@@ -6,10 +6,10 @@
 bool r_alt_down = false;
 bool meta_down = false;
 bool mac_fn_down = false;
-bool work_mode = false;
 bool recording_macro_1 = false;
 bool recording_macro_2 = false;
 
+#include "helpers/work_mode.c"
 #include "layers/layers_definitions.c"
 #include "tap_dance/tap_dance.c"
 #include "led_control/led_control.c"
@@ -111,7 +111,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             return false;
         case RGB_WRK:
             if(record->event.pressed) {
-                toggle_work_mode();
+                toggle_work_mode(false);
             }
             return false;
         case TD_RAT:
