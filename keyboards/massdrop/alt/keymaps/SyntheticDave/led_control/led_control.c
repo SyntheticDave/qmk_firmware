@@ -52,7 +52,7 @@ void show_mac_spotify_leds(void) {
 }
 
 void show_mac_vs_code_leds(void) {
-    uint8_t lit_keys[] = {25, 26, 27, 28, 40, 41, 47, 48, 52, 53, 54};
+    uint8_t lit_keys[] = {25, 26, 27, 28, 34, 40, 41, 47, 48, 52, 53, 54};
     rgb_matrix_set_collection_color(lit_keys, sizeof(lit_keys) / sizeof(uint8_t), RGB_BLUE);
 }
 
@@ -239,7 +239,7 @@ void show_custom_lighting(void) {
             break;
     }
 
-    // Set lighting based on individully held key
+    // Set lighting based on individually held key
     if (r_alt_down && layer == MAC) {
         show_mac_window_snap_keys();
     }
