@@ -8,6 +8,10 @@ void handle_leader_key(void) {
             // Put the keyboard into bootloading mode for flashing
             reset_keyboard();
         }
+        SEQ_ONE_KEY(KC_0) {
+            // Deactivate all layers except the base layer
+            layer_move(DEFAULT);
+        }
         SEQ_ONE_KEY(KC_M) {
             layer_move(MAC);  // Activate Mac OS Layer (only)
         }
