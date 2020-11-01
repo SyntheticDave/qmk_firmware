@@ -427,23 +427,23 @@ void dm_finished(qk_tap_dance_state_t *state, void *user_data, uint16_t rec_key,
   bool valid = false;
 
   switch (xtap_state.state) {
-    // Play macro
-    case SINGLE_TAP:
-        action = play_key;
-        valid = true;
-        break;
     // Finish macro recording
-    case DOUBLE_TAP:
+    case SINGLE_TAP:
         action = DYN_REC_STOP;
         kr.event.pressed = true;
         *rec_flag = false;
         valid = true;
         break;
     // Start macro recording
-    case DOUBLE_HOLD:
+    case SINGLE_HOLD:
         action = rec_key;
         valid = true;
         *rec_flag = true;
+        break;
+    // Play macro - Only here for testing. Use DM_PLY1/2 to play w/o tap dance delay
+    case DOUBLE_TAP:
+        action = play_key;
+        valid = true;
         break;
   }
 
