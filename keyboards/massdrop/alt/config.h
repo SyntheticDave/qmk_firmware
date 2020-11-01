@@ -137,4 +137,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define LEADER_PER_KEY_TIMING
 #define LEADER_TIMEOUT 250
 
+// Tap Dance Options
+#define TAPPING_TERM 175
+
+// Double the default buffer size for dynamic macros
+#define DYNAMIC_MACRO_SIZE 256
+
 #include "config_led.h"
