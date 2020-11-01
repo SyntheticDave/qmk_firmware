@@ -51,11 +51,11 @@
 #define SPOT_LTK HYPR(KC_LBRC)   // Previous Track
 
 //  Workflow Triggers
+//      Misc
+#define DICT HYPR(KC_D)  // Selected word to dictionary
 //      Code
 #define S3_OP MEH(KC_3)     // S3 Bucket
 #define S3_ROP HYPR(KC_3)   // s3 Bucket with previous client
-#define NEP_MOD MEH(KC_M)   // Rails Model
-#define NEP_AAT MEH(KC_A)   // Rails Model Attribute
 //      House Lights
 #define DST_OFF LCAG(KC_LEFT)       // Dave Study Lights Off
 #define DST_WRK LCAG(KC_UP)         // Dave Study Lights Work/Concentrate
