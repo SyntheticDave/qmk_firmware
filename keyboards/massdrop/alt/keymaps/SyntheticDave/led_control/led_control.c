@@ -92,11 +92,14 @@ void show_mac_special_leds(void) {
     // One shot layer trigger space
     rgb_matrix_set_color(61, RGB_GREEN);
 
-    // Spotify Mini Player
+    // Spotify
     rgb_matrix_set_color(51, RGB_GREEN);
 
+    // Dictionary
+    rgb_matrix_set_color(33, RGB_GOLD);
+
     // Neptune workflow triggers
-    uint8_t trigger_keys[]   = {31, 32};
+    uint8_t trigger_keys[]   = {32};
     rgb_matrix_set_collection_color(trigger_keys, sizeof(trigger_keys) / sizeof(uint8_t), RGB_BLUE);
 
     // Show Trello - Del
@@ -151,7 +154,11 @@ void show_win_gaming_leds(void) {
 
 void show_layer_indicator(int layer) {
     // Layer indicator to help me keep my bearings
-    if (layer > 0) {
+    // Assumes no more than 9 custom layers, which is true for now
+    if (layer == 0) {
+        // Zero key is at index 10 on the board
+        rgb_matrix_set_color(10, RGB_BLUE);
+    } else {
         rgb_matrix_set_color(layer, RGB_WHITE);
     }
 }
