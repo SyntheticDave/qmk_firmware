@@ -180,8 +180,12 @@ void del_finished (qk_tap_dance_state_t *state, void *user_data) {
   switch (xtap_state.state) {
     // Trello
     case SINGLE_TAP: SEND_STRING(SS_LCTL(SS_LSFT(SS_LGUI(SS_LALT(SS_TAP(X_F14)))))); break;
+    // Show Gmail
+    case DOUBLE_TAP: SEND_STRING(SS_LCTL(SS_LSFT(SS_LGUI(SS_LALT(SS_TAP(X_F19)))))); break;
+    // Show Outlook
+    case DOUBLE_HOLD: SEND_STRING(SS_LSFT(SS_LGUI(SS_LALT(SS_TAP(X_F19))))); break;
     // Calendar
-    case DOUBLE_TAP: SEND_STRING(SS_LCTL(SS_LGUI(SS_LALT(SS_TAP(X_F14))))); break;
+    case TRIPLE_TAP: SEND_STRING(SS_LCTL(SS_LGUI(SS_LALT(SS_TAP(X_F14))))); break;
   }
 }
 
@@ -197,6 +201,41 @@ void home_finished (qk_tap_dance_state_t *state, void *user_data) {
     case SINGLE_HOLD: SEND_STRING(SS_LCTL(SS_LGUI(SS_LALT(SS_TAP(X_F18))))); break;
     // Finder on double tap
     case DOUBLE_TAP: SEND_STRING(SS_LSFT(SS_LGUI(SS_LALT(SS_TAP(X_F18))))); break;
+  }
+}
+
+/*
+ Fn + Pg Up key control
+*/
+void pg_up_finished (qk_tap_dance_state_t *state, void *user_data) {
+  xtap_state.state = cur_dance(state);
+  switch (xtap_state.state) {
+    // Show VS Code
+    case SINGLE_TAP: SEND_STRING(SS_LCTL(SS_LSFT(SS_LGUI(SS_LALT(SS_TAP(X_F15)))))); break;
+    // Show terminal
+    case DOUBLE_TAP: SEND_STRING(SS_LCTL(SS_LSFT(SS_LGUI(SS_LALT(SS_TAP(X_T)))))); break;
+    // Show global terminal
+    case DOUBLE_HOLD: SEND_STRING(SS_LCTL(SS_LSFT(SS_LALT(SS_TAP(X_T))))); break;
+    // Show Fork
+    case TRIPLE_TAP: SEND_STRING(SS_LCTL(SS_LSFT(SS_LGUI(SS_TAP(X_F15))))); break;
+  }
+}
+
+/*
+ Fn + Pg Down key control
+*/
+void pg_down_finished (qk_tap_dance_state_t *state, void *user_data) {
+  xtap_state.state = cur_dance(state);
+  switch (xtap_state.state) {
+    // VS Code Go to definition
+    // Show Slack
+    case SINGLE_TAP: SEND_STRING(SS_LCTL(SS_LSFT(SS_LGUI(SS_LALT(SS_TAP(X_F16)))))); break;
+    // Show Zoom
+    case SINGLE_HOLD: SEND_STRING(SS_LCTL(SS_LGUI(SS_LALT(SS_TAP(X_F16))))); break;
+    // Chat
+    case DOUBLE_TAP: SEND_STRING(SS_LCTL(SS_LSFT(SS_LALT(SS_TAP(X_F19))))); break;
+    // TODO: Discord
+    // case DOUBLE_HOLD: SEND_STRING(SS_LCTL(SS_LSFT(SS_LALT(SS_TAP(X_...))))); break;
   }
 }
 
@@ -264,12 +303,12 @@ void fn_f_finished (qk_tap_dance_state_t *state, void *user_data) {
 void fn_v_finished (qk_tap_dance_state_t *state, void *user_data) {
   xtap_state.state = cur_dance(state);
   switch (xtap_state.state) {
-    // Meh V - Trigger text massager on selected text
-    case SINGLE_TAP: SEND_STRING(SS_LCTL(SS_LSFT(SS_LALT(SS_TAP(X_V))))); break;
     // Ctrl + Alt + V - Search Snippets Lab
-    case DOUBLE_TAP: SEND_STRING(SS_LCTL(SS_LALT(SS_TAP(X_V)))); break;
+    case SINGLE_TAP: SEND_STRING(SS_LCTL(SS_LALT(SS_TAP(X_V)))); break;
     // Hyper V - Trigger enhanced snippets on selected text
-    case TRIPLE_TAP: SEND_STRING(SS_LCTL(SS_LSFT(SS_LGUI(SS_LALT(SS_TAP(X_V)))))); break;
+    case SINGLE_HOLD: SEND_STRING(SS_LCTL(SS_LSFT(SS_LGUI(SS_LALT(SS_TAP(X_V)))))); break;
+    // Meh V - Trigger text massager on selected text
+    case DOUBLE_TAP: SEND_STRING(SS_LCTL(SS_LSFT(SS_LALT(SS_TAP(X_V))))); break;
   }
 }
 
@@ -283,43 +322,6 @@ void fn_c_finished (qk_tap_dance_state_t *state, void *user_data) {
     case SINGLE_TAP: SEND_STRING(SS_LCTL(SS_LSFT(SS_LALT(SS_TAP(X_C))))); break;
     // Hyper B - Trigger enhanced snippets on clipboard text (HYPER C being swallowed by something)
     case DOUBLE_TAP: SEND_STRING(SS_LCTL(SS_LSFT(SS_LGUI(SS_LALT(SS_TAP(X_B)))))); break;
-  }
-}
-
-/*
- Fn + Pg Down key control
-*/
-void pg_down_finished (qk_tap_dance_state_t *state, void *user_data) {
-  xtap_state.state = cur_dance(state);
-  switch (xtap_state.state) {
-    // VS Code Go to definition
-    // Show Slack
-    case SINGLE_TAP: SEND_STRING(SS_LCTL(SS_LSFT(SS_LGUI(SS_LALT(SS_TAP(X_F16)))))); break;
-    // Show Zoom
-    case SINGLE_HOLD: SEND_STRING(SS_LCTL(SS_LGUI(SS_LALT(SS_TAP(X_F16))))); break;
-    // Show Gmail
-    case DOUBLE_TAP: SEND_STRING(SS_LCTL(SS_LSFT(SS_LGUI(SS_LALT(SS_TAP(X_F19)))))); break;
-    // Show Outlook
-    case DOUBLE_HOLD: SEND_STRING(SS_LSFT(SS_LGUI(SS_LALT(SS_TAP(X_F19))))); break;
-    // Chat
-    case TRIPLE_TAP: SEND_STRING(SS_LCTL(SS_LSFT(SS_LALT(SS_TAP(X_F19))))); break;
-  }
-}
-
-/*
- Fn + Pg Up key control
-*/
-void pg_up_finished (qk_tap_dance_state_t *state, void *user_data) {
-  xtap_state.state = cur_dance(state);
-  switch (xtap_state.state) {
-    // Show VS Code
-    case SINGLE_TAP: SEND_STRING(SS_LCTL(SS_LSFT(SS_LGUI(SS_LALT(SS_TAP(X_F15)))))); break;
-    // Show terminal
-    case DOUBLE_TAP: SEND_STRING(SS_LCTL(SS_LSFT(SS_LGUI(SS_LALT(SS_TAP(X_T)))))); break;
-    // Show global terminal
-    case DOUBLE_HOLD: SEND_STRING(SS_LCTL(SS_LSFT(SS_LALT(SS_TAP(X_T))))); break;
-    // Show Fork
-    case TRIPLE_TAP: SEND_STRING(SS_LCTL(SS_LSFT(SS_LGUI(SS_TAP(X_F15))))); break;
   }
 }
 
