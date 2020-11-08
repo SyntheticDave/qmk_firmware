@@ -11,5 +11,5 @@ enum alt_keycodes {
     TYP_EXT,                // Type exit and press enter
     TYP_EXB,                // Type exit! and press enter
     MS_ENT,                 // MAC special layer enter
-    IVT_MIN,               // Inverted KC_MINS
+    IVT_MIN,                // Inverted KC_MINS
 };

@@ -70,6 +70,9 @@ void show_mac_special_leds(void) {
     show_mac_vs_code_leds();
     show_arrow_leds(RGB_WHITE);
 
+    // Right Shift
+    rgb_matrix_set_color(55, RGB_WHITE);
+
     // Exit keys
     rgb_matrix_set_color(18, RGB_ORANGE);
     rgb_matrix_set_color(17, RGB_RED);
@@ -98,18 +101,22 @@ void show_mac_special_leds(void) {
     // Dictionary
     rgb_matrix_set_color(33, RGB_GOLD);
 
+    // App Cheatsheet
+    rgb_matrix_set_color(36, RGB_PURPLE);
+
     // Neptune workflow triggers
     uint8_t trigger_keys[]   = {32};
     rgb_matrix_set_collection_color(trigger_keys, sizeof(trigger_keys) / sizeof(uint8_t), RGB_BLUE);
 
-    // Show Trello - Del
+    // Show Trello/Email/Calendar - Del
     rgb_matrix_set_color(14, RGB_BLUE);
     // Show Finder/Browser - Home
     rgb_matrix_set_color(29, RGB_TEAL);
     // Show VS Code/Terminal/Fork - PgUp
     rgb_matrix_set_color(43, RGB_PURPLE);
-    // Show Slack/Mail/Chat - PgDn
+    // Show Slack/Zoom/Chat - PgDn
     rgb_matrix_set_color(57, RGB_MAGENTA);
+
 }
 
 void show_mac_meta_leds(void) {
@@ -262,11 +269,15 @@ void show_custom_lighting(void) {
 void rgb_matrix_indicators_user(void)
 {
     show_custom_lighting();
+    // print("Showing lighting\n");
 
-	uint8_t this_led = host_keyboard_leds();
+	// uint8_t this_led = host_keyboard_leds();
 
     // FIXME: I seem to have broken the Capslock lighting
-    if (this_led & (1 << USB_LED_CAPS_LOCK)) {
+    // The top one used to work...
+    // if (this_led & (1 << USB_LED_CAPS_LOCK)) {
+    if (IS_HOST_LED_ON(USB_LED_CAPS_LOCK)) {
+        print("Capslock is on\n");
         rgb_matrix_set_collection_color(base_leds_left, sizeof(base_leds_left) / sizeof(uint8_t), RGB_RED);
     }
 }
