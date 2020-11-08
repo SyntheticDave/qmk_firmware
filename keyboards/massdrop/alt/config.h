@@ -138,7 +138,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define LEADER_TIMEOUT 250
 
 // Tap Dance Options
-#define TAPPING_TERM 175
+#define TAPPING_TERM_PER_KEY
+#define TAPPING_TERM 170
+// Fast TD Variant in milliseconds
+#define TAPPING_TERM_QUICK 70
+
 
 // Double the default buffer size for dynamic macros
 #define DYNAMIC_MACRO_SIZE 256

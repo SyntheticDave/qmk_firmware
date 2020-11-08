@@ -32,11 +32,6 @@
  */
 
 // TODO: Define hyper, meh, etc. so we can stop writing SS_LCTL(SS_LSFT(SS_TAP everywhere
-// TODO: Define PgUp and PgDn (without Fn as Tap Dance keys. Press to trigger macro, hold to record)
-// Should be able to call process_record_dynamic_macro(uint16_t keycode, keyrecord_t *record) manually with my own keys, and pass DYN_REC_START1, DYN_MACRO_PLAY1, DYN_REC_STOP to it
-// if (!process_record_dynamic_macro(keycode, record)) {
-//     return false;
-// }
 
 #define TAPPING_TOGGLE 2
 
@@ -54,7 +49,7 @@ enum {
   DOUBLE_SINGLE_TAP = 5, //send two single taps
   TRIPLE_TAP = 6,
   TRIPLE_HOLD = 7,
-  HOLD = 8
+  HOLD = 8  // For modifier keys
 };
 
 //Tap dance enums
@@ -76,6 +71,8 @@ enum {
     T_FNF,
     T_DM1,
     T_DM2,
+    T_FLB,
+    T_FRB,
 };
 
 #define TD_DEL TD(T_DEL)
@@ -95,6 +92,8 @@ enum {
 #define TD_FNF TD(T_FNF)
 #define TD_DM1 TD(T_DM1)
 #define TD_DM2 TD(T_DM2)
+#define TD_FLB TD(T_FLB)
+#define TD_FRB TD(T_FRB)
 
 int cur_dance (qk_tap_dance_state_t *state);
 
@@ -117,6 +116,8 @@ void ralt_reset (qk_tap_dance_state_t *state, void *user_data);
 void ralt_reset (qk_tap_dance_state_t *state, void *user_data);
 void dm1_finished (qk_tap_dance_state_t *state, void *user_data);
 void dm2_finished (qk_tap_dance_state_t *state, void *user_data);
+void flb_finished (qk_tap_dance_state_t *state, void *user_data);
+void frb_finished (qk_tap_dance_state_t *state, void *user_data);
 
 int cur_dance (qk_tap_dance_state_t *state) {
   if (state->count == 1) {
@@ -162,7 +163,7 @@ int cur_modifier_dance (qk_tap_dance_state_t *state) {
   else return cur_dance(state);
 }
 
-//instanalize an instance of 'tap' for the 'x' tap dance.
+//initialize an instance of 'tap' for the 'x' tap dance.
 static tap xtap_state = {
   .is_press_action = true,
   .state = 0
@@ -179,13 +180,13 @@ void del_finished (qk_tap_dance_state_t *state, void *user_data) {
   xtap_state.state = cur_dance(state);
   switch (xtap_state.state) {
     // Trello
-    case SINGLE_TAP: SEND_STRING(SS_LCTL(SS_LSFT(SS_LGUI(SS_LALT(SS_TAP(X_F14)))))); break;
+    case SINGLE_TAP: SEND_STRING(SS_TAP(X_F13)); break;
     // Show Gmail
-    case DOUBLE_TAP: SEND_STRING(SS_LCTL(SS_LSFT(SS_LGUI(SS_LALT(SS_TAP(X_F19)))))); break;
+    case DOUBLE_TAP: SEND_STRING(SS_LGUI(SS_TAP(X_F13))); break;
     // Show Outlook
-    case DOUBLE_HOLD: SEND_STRING(SS_LSFT(SS_LGUI(SS_LALT(SS_TAP(X_F19))))); break;
+    case DOUBLE_HOLD: SEND_STRING(SS_LALT(SS_TAP(X_F13))); break;
     // Calendar
-    case TRIPLE_TAP: SEND_STRING(SS_LCTL(SS_LGUI(SS_LALT(SS_TAP(X_F14))))); break;
+    case TRIPLE_TAP: SEND_STRING(SS_LCTL(SS_TAP(X_F13))); break;
   }
 }
 
@@ -245,16 +246,17 @@ void pg_down_finished (qk_tap_dance_state_t *state, void *user_data) {
 void m_finished (qk_tap_dance_state_t *state, void *user_data) {
   xtap_state.state = cur_dance(state);
   switch (xtap_state.state) {
-    // Spotify Mini Player on single tap
+    // Spotify Mini Player on tap
     case SINGLE_TAP: SEND_STRING(SS_LCTL(SS_LSFT(SS_LALT(SS_TAP(X_S))))); break;
-    // Spotify on double tap
-    case DOUBLE_TAP: SEND_STRING(SS_LCTL(SS_LSFT(SS_LGUI(SS_LALT(SS_TAP(X_M)))))); break;
+    // Spotify on hold
+    case SINGLE_HOLD: SEND_STRING(SS_LCTL(SS_LSFT(SS_LGUI(SS_LALT(SS_TAP(X_M)))))); break;
   }
 }
 
 /*
  Fn + / key control
 */
+// REVISE: I don't use these a whole lot. Consider moving/removing
 void slash_finished (qk_tap_dance_state_t *state, void *user_data) {
   xtap_state.state = cur_dance(state);
   switch (xtap_state.state) {
@@ -469,6 +471,32 @@ void dm2_finished (qk_tap_dance_state_t *state, void *user_data) {
     dm_finished(state, user_data, DYN_REC_START2, DYN_MACRO_PLAY2, &recording_macro_2);
 }
 
+/*
+  Fn + Left Bracket control
+*/
+void flb_finished (qk_tap_dance_state_t *state, void *user_data) {
+  xtap_state.state = cur_dance(state);
+  switch (xtap_state.state) {
+    // Move to left panel
+    case SINGLE_TAP: SEND_STRING(SS_LALT(SS_LCTL(SS_LGUI(SS_TAP(X_LBRC))))); break;
+    // Move to left panel with current file
+    case SINGLE_HOLD: SEND_STRING(SS_LALT(SS_LCTL(SS_LSFT(SS_LGUI(SS_TAP(X_LBRC)))))); break;
+  }
+}
+
+/*
+  Fn + Right Bracket control
+*/
+void frb_finished (qk_tap_dance_state_t *state, void *user_data) {
+  xtap_state.state = cur_dance(state);
+  switch (xtap_state.state) {
+    // Move to right panel
+    case SINGLE_TAP: SEND_STRING(SS_LALT(SS_LCTL(SS_LGUI(SS_TAP(X_RBRC))))); break;
+    // Move to right panel with current file
+    case SINGLE_HOLD: SEND_STRING(SS_LALT(SS_LCTL(SS_LSFT(SS_LGUI(SS_TAP(X_RBRC)))))); break;
+  }
+}
+
 qk_tap_dance_action_t tap_dance_actions[] = {
   [T_DEL] = ACTION_TAP_DANCE_FN_ADVANCED(NULL,del_finished, tap_dance_reset),
   [T_HME] = ACTION_TAP_DANCE_FN_ADVANCED(NULL,home_finished, tap_dance_reset),
@@ -487,4 +515,8 @@ qk_tap_dance_action_t tap_dance_actions[] = {
   [T_FNF] = ACTION_TAP_DANCE_FN_ADVANCED(NULL,fn_f_finished, tap_dance_reset),
   [T_DM1] = ACTION_TAP_DANCE_FN_ADVANCED(NULL,dm1_finished, tap_dance_reset),
   [T_DM2] = ACTION_TAP_DANCE_FN_ADVANCED(NULL,dm2_finished, tap_dance_reset),
+    //  REVISE: Deprecated behaviour, but docs are a little light on new implementation
+    // Didn't have any luck with custom get_tapping_term
+  [T_FLB] = ACTION_TAP_DANCE_FN_ADVANCED_TIME(NULL, flb_finished, tap_dance_reset, TAPPING_TERM_QUICK),
+  [T_FRB] = ACTION_TAP_DANCE_FN_ADVANCED_TIME(NULL, frb_finished, tap_dance_reset, TAPPING_TERM_QUICK),
 };
