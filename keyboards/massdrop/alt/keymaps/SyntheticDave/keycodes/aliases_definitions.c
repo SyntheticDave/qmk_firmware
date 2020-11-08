@@ -26,19 +26,6 @@
 #define SNK_TOG TG(SNAKE)       // Toggle snake case layer (space sends underscore)
 #define RGB_PRV TG(KB_RGB_PRV)  // Preview RGB lighting while in config layer
 
-// App Focus Shortcuts
-#define TERM_D MEH(KC_T)  // Open dedicated terminal window
-#define TERM_S HYPR(KC_T) // Show/Hide all terminal windows
-#define MAC_FN KC_F20 // Karabiner listens for F20 and turns it into an apple keyboard fn
-#define TRELLO HYPR(KC_F13)
-#define FINDER HYPR(KC_F14)
-#define VS_CODE HYPR(KC_F15)
-#define FORK MEH(KC_F15)
-#define SLACK HYPR(KC_F16)
-#define BROWSER HYPR(KC_F18)
-#define MUSIC   HYPR(KC_M) // Show the music Player
-#define EMAIL HYPR(KC_F19)
-
 // Music Control - Alfred Spotify Mini Player
 #define SPOT_MP MEH(KC_S)       // Show Mini Player Control
 #define SPOT_QU MEH(KC_DOT)     // Play Queue
