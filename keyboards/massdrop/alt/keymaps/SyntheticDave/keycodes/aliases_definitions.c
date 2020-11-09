@@ -43,6 +43,7 @@
 // TODO: Global, so consider making F Keys. Once app focus keys tidied up
 #define DICT HYPR(KC_D)  // Selected word to dictionary
 #define APP_HLP HYPR(KC_H)          // Show cheatsheet for focused application
+#define MDL_ATR HYPR(KC_A)          // Model attribute list
 //      Code
 #define S3_OP MEH(KC_3)     // S3 Bucket
 #define S3_ROP HYPR(KC_3)   // s3 Bucket with previous client

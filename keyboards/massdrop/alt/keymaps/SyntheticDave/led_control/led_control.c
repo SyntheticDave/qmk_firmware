@@ -104,6 +104,9 @@ void show_mac_special_leds(void) {
     // App Cheatsheet
     rgb_matrix_set_color(36, RGB_PURPLE);
 
+    // Model Attribute List
+    rgb_matrix_set_color(31, RGB_BLUE);
+
     // Neptune workflow triggers
     uint8_t trigger_keys[]   = {32};
     rgb_matrix_set_collection_color(trigger_keys, sizeof(trigger_keys) / sizeof(uint8_t), RGB_BLUE);
