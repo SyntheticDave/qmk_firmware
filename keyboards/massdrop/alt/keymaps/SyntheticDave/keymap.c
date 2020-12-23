@@ -35,6 +35,14 @@ void matrix_scan_user(void) {
     handle_leader_key();
 };
 
+void trigger_alfred(void) {
+    SEND_STRING(SS_DOWN(X_LGUI));
+    SEND_STRING(SS_TAP(X_SPACE));
+    SEND_STRING(SS_UP(X_LGUI));
+    // Ensure Alfred is open before anything else triggers
+    SEND_STRING(SS_DELAY(100));
+}
+
 #define MODS_SHIFT (get_mods() & MOD_BIT(KC_LSHIFT) || get_mods() & MOD_BIT(KC_RSHIFT))
 #define MODS_CTRL (get_mods() & MOD_BIT(KC_LCTL) || get_mods() & MOD_BIT(KC_RCTRL))
 #define MODS_ALT (get_mods() & MOD_BIT(KC_LALT) || get_mods() & MOD_BIT(KC_RALT))
@@ -115,6 +123,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             }
             return false;
         case TD_RAT:
+        case KC_RALT:
             r_alt_down = record->event.pressed;
             return true;
         case MAC_FN:
@@ -147,6 +156,13 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 SEND_STRING("exit!\n");
             }
             return false;
+        case KC_LOCK:
+            if (record->event.pressed) {
+                trigger_alfred();
+                SEND_STRING("lock\n");
+            }
+            return false;
+
         // Inverted minus — Sends underscore by default
         // Not currently in use
         case IVT_MIN:

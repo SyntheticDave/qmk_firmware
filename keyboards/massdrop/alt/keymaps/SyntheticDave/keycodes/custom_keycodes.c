@@ -12,4 +12,5 @@ enum alt_keycodes {
     TYP_EXB,                // Type exit! and press enter
     MS_ENT,                 // MAC special layer enter
     IVT_MIN,                // Inverted KC_MINS
+    KC_LOCK,                // Lock Mac OS (using alfred)
 };
