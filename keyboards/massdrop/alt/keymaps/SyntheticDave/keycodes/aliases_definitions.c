@@ -52,3 +52,16 @@
 #define DST_WRK LCAG(KC_UP)         // Dave Study Lights Work/Concentrate
 #define DST_STD LCAG(KC_RIGHT)      // Dave Study Reading Lights
 #define DST_RLX LCAG(KC_DOWN)       // Dave Study Lights Relax
+
+// Send String Shortcuts
+#define SS_HYPR(string) SS_LCTL(SS_LSFT(SS_LGUI(SS_LALT(SS_TAP(string)))))
+#define SS_MEH(string) SS_LCTL(SS_LSFT((SS_LALT(SS_TAP(string))))
+#define SS_LSG(string) SS_LSFT(SS_LGUI(SS_TAP(string)))
+#define SS_LCG(string) SS_LCTL(SS_LGUI(SS_TAP(string)))
+#define SS_LAG(string) SS_LALT(SS_LGUI(SS_TAP(string)))
+#define SS_LSCG(string) SS_LSFT(SS_LCTL(SS_LGUI(SS_TAP(string))))
+#define SS_LSAG(string) SS_LSFT(SS_LALT(SS_LGUI(SS_TAP(string))))
+#define SS_LCAG(string) SS_LCTL(SS_LALT(SS_LGUI(SS_TAP(string))))
+#define SS_LSC(string) SS_LCTL(SS_LSFT(SS_TAP(string)))
+#define SS_LSA(string) SS_LALT(SS_LSFT(SS_TAP(string)))
+#define SS_LCA(string) SS_LALT(SS_LCTL(SS_TAP(string)))

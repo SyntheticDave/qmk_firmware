@@ -11,11 +11,11 @@ bool recording_macro_2 = false;
 
 #include "helpers/work_mode.c"
 #include "layers/layers_definitions.c"
+#include "keycodes/aliases_definitions.c"
 #include "tap_dance/tap_dance.c"
 #include "led_control/led_control.c"
 #include "leader/leader.c"
 #include "keycodes/custom_keycodes.c"
-#include "keycodes/aliases_definitions.c"
 #include "keycodes/keymap.c"    // Actual keymap
 
 void keyboard_post_init_user(void) {
