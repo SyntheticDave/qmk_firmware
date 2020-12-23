@@ -21,55 +21,64 @@ enum {
 enum {
     T_DEL,
     T_HME,
-    T_KCM,
-    T_SLS,
     T_PDN,
     T_PUP,
+    T_DM1,
+    T_DM2,
     T_LSH,
     T_RSH,
     T_LCL,
     T_LAT,
     T_RAT,
-    T_S3C,
-    T_FNC,
-    T_FNV,
-    T_FNF,
-    T_DM1,
-    T_DM2,
+    T_FN3,
+    T_FNT,
     T_FLB,
     T_FRB,
+    T_FNA,
+    T_FNS,
+    T_FNF,
+    T_FNC,
+    T_FNV,
+    T_FNM,
+    T_SLS,
 };
 
 #define TD_DEL TD(T_DEL)
 #define TD_HME TD(T_HME)
-#define TD_KCM TD(T_KCM)
-#define TD_SLS TD(T_SLS)
 #define TD_PDN TD(T_PDN)
 #define TD_PUP TD(T_PUP)
+#define TD_DM1 TD(T_DM1)
+#define TD_DM2 TD(T_DM2)
 #define TD_LSH TD(T_LSH)
 #define TD_RSH TD(T_RSH)
 #define TD_LCL TD(T_LCL)
 #define TD_LAT TD(T_LAT)
 #define TD_RAT TD(T_RAT)
-#define TD_S3C TD(T_S3C)
-#define TD_FNC TD(T_FNC)
-#define TD_FNV TD(T_FNV)
-#define TD_FNF TD(T_FNF)
-#define TD_DM1 TD(T_DM1)
-#define TD_DM2 TD(T_DM2)
+#define TD_FN3 TD(T_FN3)
+#define TD_FNT TD(T_FNT)
 #define TD_FLB TD(T_FLB)
 #define TD_FRB TD(T_FRB)
+#define TD_FNA TD(T_FNA)
+#define TD_FNS TD(T_FNS)
+#define TD_FNF TD(T_FNF)
+#define TD_FNC TD(T_FNC)
+#define TD_FNV TD(T_FNV)
+#define TD_FNM TD(T_FNM)
+#define TD_SLS TD(T_SLS)
 
 int cur_dance(qk_tap_dance_state_t *state);
 
 void tap_dance_reset(qk_tap_dance_state_t *state, void *user_data);
 void del_finished(qk_tap_dance_state_t *state, void *user_data);
 void home_finished(qk_tap_dance_state_t *state, void *user_data);
-void s3c_finished(qk_tap_dance_state_t *state, void *user_data);
-void m_finished(qk_tap_dance_state_t *state, void *user_data);
+void fn_3_finished(qk_tap_dance_state_t *state, void *user_data);
+void fn_t_finished(qk_tap_dance_state_t *state, void *user_data);
+void fn_a_finished(qk_tap_dance_state_t *state, void *user_data);
+void fn_s_finished(qk_tap_dance_state_t *state, void *user_data);
+void fn_f_finished(qk_tap_dance_state_t *state, void *user_data);
 void fn_c_finished(qk_tap_dance_state_t *state, void *user_data);
 void fn_v_finished(qk_tap_dance_state_t *state, void *user_data);
-void fn_f_finished(qk_tap_dance_state_t *state, void *user_data);
+void m_finished(qk_tap_dance_state_t *state, void *user_data);
 void slash_finished(qk_tap_dance_state_t *state, void *user_data);
 void pg_down_finished(qk_tap_dance_state_t *state, void *user_data);
 void pg_up_finished(qk_tap_dance_state_t *state, void *user_data);
@@ -91,25 +100,27 @@ void frb_finished(qk_tap_dance_state_t *state, void *user_data);
 qk_tap_dance_action_t tap_dance_actions[] = {
     [T_DEL] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, del_finished, tap_dance_reset),
     [T_HME] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, home_finished, tap_dance_reset),
-    [T_KCM] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, m_finished, tap_dance_reset),
-    [T_SLS] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, slash_finished, tap_dance_reset),
     [T_PDN] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, pg_down_finished, tap_dance_reset),
     [T_PUP] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, pg_up_finished, tap_dance_reset),
+    [T_DM1] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, dm1_finished, tap_dance_reset),
+    [T_DM2] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, dm2_finished, tap_dance_reset),
     [T_LSH] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, lshft_finished, lshft_reset),
     [T_RSH] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, rshft_finished, rshft_reset),
     [T_LCL] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, lctrl_finished, lctrl_reset),
     [T_LAT] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, lalt_finished, lalt_reset),
     [T_RAT] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, ralt_finished, ralt_reset),
-    [T_S3C] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, s3c_finished, tap_dance_reset),
-    [T_FNC] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, fn_c_finished, tap_dance_reset),
-    [T_FNV] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, fn_v_finished, tap_dance_reset),
-    [T_FNF] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, fn_f_finished, tap_dance_reset),
-    [T_DM1] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, dm1_finished, tap_dance_reset),
-    [T_DM2] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, dm2_finished, tap_dance_reset),
-    //  REVISE: Deprecated behaviour, but docs are a little light on new implementation
-    // Didn't have any luck with custom get_tapping_term
+    [T_FN3] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, fn_3_finished, tap_dance_reset),
+    [T_FNT] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, fn_t_finished, tap_dance_reset),
+    //  REVISE: Deprecated behaviour, but docs are a little light on new implementation. Didn't have any luck with custom get_tapping_term.
     [T_FLB] = ACTION_TAP_DANCE_FN_ADVANCED_TIME(NULL, flb_finished, tap_dance_reset, TAPPING_TERM_QUICK),
     [T_FRB] = ACTION_TAP_DANCE_FN_ADVANCED_TIME(NULL, frb_finished, tap_dance_reset, TAPPING_TERM_QUICK),
+    [T_FNA] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, fn_a_finished, tap_dance_reset),
+    [T_FNS] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, fn_s_finished, tap_dance_reset),
+    [T_FNF] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, fn_f_finished, tap_dance_reset),
+    [T_FNC] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, fn_c_finished, tap_dance_reset),
+    [T_FNV] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, fn_v_finished, tap_dance_reset),
+    [T_FNM] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, m_finished, tap_dance_reset),
+    [T_SLS] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, slash_finished, tap_dance_reset),
 };
 
 // Shared tapdance functions

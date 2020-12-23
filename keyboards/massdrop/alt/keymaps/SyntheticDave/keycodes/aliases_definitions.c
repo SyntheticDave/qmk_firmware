@@ -43,7 +43,6 @@
 // TODO: Global, so consider making F Keys. Once app focus keys tidied up
 #define DICT HYPR(KC_D)  // Selected word to dictionary
 #define APP_HLP HYPR(KC_H)          // Show cheatsheet for focused application
-#define MDL_ATR HYPR(KC_A)          // Model attribute list
 //      Code
 #define S3_OP MEH(KC_3)     // S3 Bucket
 #define S3_ROP HYPR(KC_3)   // s3 Bucket with previous client
@@ -55,7 +54,7 @@
 
 // Send String Shortcuts
 #define SS_HYPR(string) SS_LCTL(SS_LSFT(SS_LGUI(SS_LALT(SS_TAP(string)))))
-#define SS_MEH(string) SS_LCTL(SS_LSFT((SS_LALT(SS_TAP(string))))
+#define SS_MEH(string) SS_LCTL(SS_LSFT(SS_LALT(SS_TAP(string))))
 #define SS_LSG(string) SS_LSFT(SS_LGUI(SS_TAP(string)))
 #define SS_LCG(string) SS_LCTL(SS_LGUI(SS_TAP(string)))
 #define SS_LAG(string) SS_LALT(SS_LGUI(SS_TAP(string)))
@@ -65,3 +64,24 @@
 #define SS_LSC(string) SS_LCTL(SS_LSFT(SS_TAP(string)))
 #define SS_LSA(string) SS_LALT(SS_LSFT(SS_TAP(string)))
 #define SS_LCA(string) SS_LALT(SS_LCTL(SS_TAP(string)))
+
+// Syntactic sugar for tapdance
+// Key 1
+#define SS_ST_1(string) SS_TAP(string)
+#define SS_SH_1(string) SS_LGUI(SS_TAP(string))
+#define SS_DT_1(string) SS_LSG(string)
+#define SS_DH_1(string) SS_LCG(string)
+#define SS_TT_1(string) SS_LAG(string)
+#define SS_TH_1(string) SS_LSCG(string)
+// Key 2
+#define SS_ST_2(string) SS_LSAG(string)
+#define SS_SH_2(string) SS_LCAG(string)
+#define SS_DT_2(string) SS_HYPR(string)
+#define SS_DH_2(string) SS_LSFT(SS_TAP(string))
+#define SS_TT_2(string) SS_LSC(string)
+#define SS_TH_2(string) SS_LSA(string)
+// Key 3
+#define SS_ST_3(string) SS_MEH(string)
+#define SS_SH_3(string) SS_LCTL(SS_TAP(string))
+#define SS_DT_3(string) SS_LCA(string)
+#define SS_DH_3(string) SS_LALT(SS_TAP(string))
